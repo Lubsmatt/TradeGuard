@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Risk Calculator</title>
+</head>
+<body style="font-family:Arial; background:#1e1e1e; color:white;">
+
+<div style="width:500px; margin:50px auto; background:#2a2a2a; padding:30px; border-radius:10px;">
+
+<h2>Risk Calculator</h2>
+
+<form method="POST">
+
+<label>Balance</label>
+<input type="number" step="any" name="balance" required style="width:100%; padding:8px; margin-bottom:10px;">
+
+<label>Risk %</label>
+<input type="number" step="any" name="risk_percent" required style="width:100%; padding:8px; margin-bottom:10px;">
+
+<label>Stop Loss (pips)</label>
+<input type="number" step="any" name="sl" required style="width:100%; padding:8px; margin-bottom:10px;">
+
+<label>Take Profit (pips)</label>
+<input type="number" step="any" name="tp" required style="width:100%; padding:8px; margin-bottom:10px;">
+
+<label>Select Pair</label>
+<select name="pair" required style="width:100%; padding:8px; margin-bottom:15px;">
+    {% for pair in pairs %}
+        <option value="{{ pair }}">{{ pair }}</option>
+    {% endfor %}
+</select>
+
+<button type="submit" style="width:100%; padding:10px; background:#4caf50; color:white; border:none;">
+    Calculate
+</button>
+
+</form>
+
+<p style="margin-top:15px;">
+<strong>Today's Total Risk:</strong> {{ daily_risk }}%
+</p>
+
+{% if result %}
+<div style="margin-top:20px; background:#333; padding:15px; border-radius:8px;">
+<p><strong>Pair:</strong> {{ result.pair }}</p>
+<p><strong>Risk Amount:</strong> ${{ result.risk_amount }}</p>
+<p><strong>Lot Size:</strong> {{ result.lot }}</p>
+<p><strong>Position Size:</strong> {{ result.position_size }}</p>
+<p><strong>Potential Reward:</strong> ${{ result.reward }}</p>
+<p><strong>R:R Ratio:</strong> 1 : {{ result.rr_ratio }}</p>
+
+<a href="/check">
+<button style="margin-top:10px; width:100%; padding:8px; background:#2196f3; color:white; border:none;">
+Proceed to Checklist
+</button>
+</a>
+
+</div>
+{% endif %}
+
+{% if error %}
+<p style="color:red; margin-top:10px;">{{ error }}</p>
+{% endif %}
+
+<br>
+<a href="/reset">
+<button style="width:100%; padding:8px; background:#f44336; color:white; border:none;">
+Reset Daily Risk
+</button>
+</a>
+
+</div>
+
+</body>
+</html>

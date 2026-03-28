@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Trade Checklist</title>
+</head>
+<body style="font-family:Arial; background:#111; color:white;">
+
+<div style="width:500px; margin:60px auto; background:#222; padding:30px; border-radius:10px;">
+
+<h2 style="text-align:center;">Pre-Trade Checklist</h2>
+
+<form method="POST" action="{{ url_for('confirm_trade') }}" id="checkForm">
+
+    <div style="margin-bottom:10px;">
+        <input type="checkbox" class="checkItem">
+        Trend Confirmed
+    </div>
+
+    <div style="margin-bottom:10px;">
+        <input type="checkbox" class="checkItem">
+        Entry Validated
+    </div>
+
+    <div style="margin-bottom:10px;">
+        <input type="checkbox" class="checkItem">
+        Risk Under 5%
+    </div>
+
+    <div style="margin-bottom:10px;">
+        <input type="checkbox" class="checkItem">
+        News Checked
+    </div>
+
+    <div style="margin-bottom:20px;">
+        <input type="checkbox" class="checkItem">
+        Emotion Controlled
+    </div>
+
+    <button type="submit" id="confirmBtn"
+        style="width:100%; padding:10px; background:gray; color:white; border:none;"
+        disabled>
+        Confirm Trade
+    </button>
+
+</form>
+
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+
+    const checkboxes = document.querySelectorAll(".checkItem");
+    const button = document.getElementById("confirmBtn");
+
+    function updateButton() {
+        let allChecked = true;
+
+        checkboxes.forEach(function(box) {
+            if (!box.checked) {
+                allChecked = false;
+            }
+        });
+
+        button.disabled = !allChecked;
+
+        if (allChecked) {
+            button.style.background = "#4CAF50";
+        } else {
+            button.style.background = "gray";
+        }
+    }
+
+    checkboxes.forEach(function(box) {
+        box.addEventListener("change", updateButton);
+    });
+
+});
+</script>
+
+</body>
+</html>

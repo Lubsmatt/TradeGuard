@@ -1,0 +1,23 @@
+<h2>Your Trade History</h2>
+
+<table border="1">
+<tr>
+    <th>Pair</th>
+    <th>Risk %</th>
+    <th>Risk $</th>
+    <th>RR</th>
+    <th>Reward</th>
+    <th>Date</th>
+</tr>
+
+{% for trade in trades %}
+<tr>
+    <td>{{ trade[0] }}</td>
+    <td>{{ trade[1] }}</td>
+    <td>{{ trade[2] }}</td>
+    <td>{{ trade[3] }}</td>
+    <td>{{ trade[4] }}</td>
+    <td>{{ trade[5] }}</td>
+</tr>
+{% endfor %}
+</table>

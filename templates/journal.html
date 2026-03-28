@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <title>Trade Journal</title>
+</head>
+<body style="font-family:Arial; background:#111; color:white;">
+
+<div style="width:600px; margin:60px auto; background:#222; padding:30px; border-radius:10px;">
+
+<h2>Trade Journal</h2>
+
+<div style="margin-top:20px; background:#333; padding:20px; border-radius:10px;">
+
+<h3>Performance Dashboard</h3>
+
+<p><strong>Total Trades:</strong> {{ total_trades }}</p>
+
+<p><strong>Win Rate:</strong> {{ win_rate }}%</p>
+
+<p><strong>Net Profit:</strong> ${{ net_pl }}</p>
+
+<p><strong>Profit Factor:</strong> {{ profit_factor }}</p>
+
+</div>
+
+<div style="margin-top:20px; background:#333; padding:20px; border-radius:10px;">
+
+<h3>Pair Analytics</h3>
+
+<p><strong>Best Pair:</strong> {{ best_pair }}</p>
+
+<p><strong>Worst Pair:</strong> {{ worst_pair }}</p>
+
+<p><strong>Most Traded Pair:</strong> {{ most_traded }}</p>
+
+</div>
+
+<div style="margin-top:20px; background:#333; padding:20px; border-radius:10px;">
+
+<h3>Trading Psychology</h3>
+
+<p><strong>Current Streak:</strong> {{ current_streak }} {{ current_type }}</p>
+
+<p><strong>Longest Winning Streak:</strong> {{ max_win_streak }}</p>
+
+<p><strong>Longest Losing Streak:</strong> {{ max_loss_streak }}</p>
+
+</div>
+
+<div style="margin-top:20px; background:#333; padding:20px; border-radius:10px;">
+
+<h3>Risk Metrics</h3>
+
+<p><strong>Max Drawdown:</strong> ${{ max_drawdown }}</p>
+
+<p><strong>Current Drawdown:</strong> ${{ current_drawdown }}</p>
+
+</div>
+
+<h3>Equity Curve</h3>
+
+<canvas id="equityChart" style="background:#222; padding:10px; border-radius:10px;"></canvas>
+
+<script>
+
+let equityData = JSON.parse('{{ equity_curve | tojson | safe }}');
+
+const ctx = document.getElementById('equityChart');
+
+new Chart(ctx, {
+    type: 'line',
+    data: {
+        labels: equityData.map((_, i) => i + 1),
+        datasets: [{
+            label: 'Equity Growth',
+            data: equityData,
+            borderWidth: 2,
+            tension: 0.2
+        }]
+    },
+    options: {
+        plugins: {
+            legend: {
+                labels: {
+                    color: "white"
+                }
+            }
+        },
+        scales: {
+            x: {
+                ticks: { color: "white" }
+            },
+            y: {
+                ticks: { color: "white" }
+            }
+        }
+    }
+});
+
+</script>
+
+<div style="margin-top:15px; background:#333; padding:15px; border-radius:8px;">
+    <p><strong>Total Trades:</strong> {{ total_trades }}</p>
+    <p><strong>Total Risk Used:</strong> {{ total_risk }}%</p>
+    <p><strong>Remaining Risk:</strong> {{ remaining_risk }}%</p>
+</div>
+
+<div style="margin-top:15px; background:#444; padding:15px; border-radius:8px;">
+    <p><strong>Net P/L:</strong> ${{ net_pl }}</p>
+    <p><strong>Win Rate:</strong> {{ win_rate }}%</p>
+</div>
+
+{% if trades %}
+    <table style="width:100%; margin-top:20px; border-collapse:collapse;">
+        <tr style="background:#333;">
+            <th>Pair</th>
+            <th>Risk %</th>
+            <th>Risk Amount</th>
+            <th>R:R</th>
+            <th>Result</th>
+        </tr>
+
+        {% for trade in trades %}
+<tr style="text-align:center;">
+    <td>{{ trade.pair }}</td>
+    <td>{{ trade.risk_percent }}%</td>
+    <td>${{ trade.risk_amount }}</td>
+    <td>1 : {{ trade.rr_ratio }}</td>
+    <td>
+       {% if trade.result == "pending" %}
+Pending
+<a href="/update_result/{{ trade.id }}/win">Win</a>
+<a href="/update_result/{{ trade.id }}/loss">Loss</a>
+
+{% else %}
+{{ trade.result }}
+
+{% endif %}
+    </td>
+</tr>
+{% endfor %}
+    </table>
+{% else %}
+    <p>No trades recorded yet.</p>
+{% endif %}
+
+<br>
+<a href="/risk">
+    <button style="width:100%; padding:10px;">Back to Risk Calculator</button>
+</a>
+
+</div>
+
+</body>
+</html>
