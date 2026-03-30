@@ -273,6 +273,35 @@ def confirm_trade():
         return redirect(url_for("home"))
 
     conn = get_db_connection()
+
+    # 🔥 GET CURRENT USER FROM DB
+    user = conn.execute(
+        "SELECT * FROM users WHERE id = ?",
+        (session["user_id"],)
+    ).fetchone()
+
+    import datetime
+    today = str(datetime.date.today())
+
+    # 🔁 RESET IF NEW DAY
+    if user["last_trade_date"] != today:
+        conn.execute(
+            "UPDATE users SET daily_trades = 0, last_trade_date = ? WHERE id = ?",
+            (today, user["id"])
+        )
+        user = dict(user)
+        user["daily_trades"] = 0
+
+    # 🚫 LIMIT CHECK (FREE USERS ONLY)
+    if user["plan"] == "free" and user["daily_trades"] >= 5:
+        conn.close()
+        return "Daily trade limit reached. Upgrade to Pro."
+
+    # ➕ INCREMENT TRADE COUNT
+    conn.execute(
+        "UPDATE users SET daily_trades = daily_trades + 1 WHERE id = ?",
+        (user["id"],)
+    )
     cursor = conn.cursor()
 
     cursor.execute("""
@@ -494,9 +523,25 @@ def init_db():
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         username TEXT UNIQUE,
         password BLOB,
-        plan TEXT DEFAULT 'free'
+        plan TEXT DEFAULT 'free',
+        daily_trades INTEGER DEFAULT 0,
+        last_trade_date TEXT
     )
     """)
+
+    # Add columns if they don’t exist (for existing users)
+    try:
+        c.execute("ALTER TABLE users ADD COLUMN daily_trades INTEGER DEFAULT 0")
+    except:
+        pass
+
+    try:
+        c.execute("ALTER TABLE users ADD COLUMN last_trade_date TEXT")
+    except:
+        pass
+
+    conn.commit()
+    conn.close()
 
     c.execute("""
     CREATE TABLE IF NOT EXISTS trades (
