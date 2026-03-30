@@ -273,63 +273,41 @@ def confirm_trade():
         return redirect(url_for("home"))
 
     conn = get_db_connection()
-
-    # 🔥 GET CURRENT USER FROM DB
-    user = conn.execute(
-        "SELECT * FROM users WHERE id = ?",
-        (session["user_id"],)
-    ).fetchone()
-
-    import datetime
-    today = str(datetime.date.today())
-
-    # 🔁 RESET IF NEW DAY
-    if user["last_trade_date"] != today:
-        conn.execute(
-            "UPDATE users SET daily_trades = 0, last_trade_date = ? WHERE id = ?",
-            (today, user["id"])
-        )
-        user = dict(user)
-        user["daily_trades"] = 0
-
-    # 🚫 LIMIT CHECK (FREE USERS ONLY)
-    if user["plan"] == "free" and user["daily_trades"] >= 5:
-        conn.close()
-        return "Daily trade limit reached. Upgrade to Pro."
-
-    # ➕ INCREMENT TRADE COUNT
-    conn.execute(
-        "UPDATE users SET daily_trades = daily_trades + 1 WHERE id = ?",
-        (user["id"],)
-    )
     cursor = conn.cursor()
 
-    cursor.execute("""
-        INSERT INTO trades (
-            user_id,
-            pair,
-            risk_percent,
-            risk_amount,
-            rr_ratio,
-            reward,
-            result,
-            date
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-    """, (
-        session["user_id"],
-        trade.get("pair"),
-        trade.get("risk_percent"),
-        trade.get("risk_amount"),
-        trade.get("rr_ratio"),
-        trade.get("reward", 0),
-        "pending",
-        datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    ))
+    try:
+        cursor.execute("""
+            INSERT INTO trades (
+                user_id,
+                pair,
+                risk_percent,
+                risk_amount,
+                rr_ratio,
+                reward,
+                result,
+                date
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        """, (
+            session["user_id"],
+            trade.get("pair"),
+            trade.get("risk_percent"),
+            trade.get("risk_amount"),
+            trade.get("rr_ratio"),
+            trade.get("reward", 0),
+            "pending",
+            datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        ))
 
-    conn.commit()
-    conn.close()
+        conn.commit()
 
-    session.pop("pending_trade", "pending")
+    except Exception as e:
+        print("ERROR saving trade:", e)
+        return "Error saving trade"
+
+    finally:
+        conn.close()
+
+    session.pop("pending_trade", None)
 
     return redirect(url_for("journal"))
 
