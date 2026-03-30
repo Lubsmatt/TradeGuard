@@ -518,6 +518,7 @@ def init_db():
     conn = sqlite3.connect("database.db")
     c = conn.cursor()
 
+    # USERS TABLE
     c.execute("""
     CREATE TABLE IF NOT EXISTS users (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -529,7 +530,7 @@ def init_db():
     )
     """)
 
-    # Add columns if they don’t exist (for existing users)
+    # Add columns if they don’t exist
     try:
         c.execute("ALTER TABLE users ADD COLUMN daily_trades INTEGER DEFAULT 0")
     except:
@@ -540,9 +541,7 @@ def init_db():
     except:
         pass
 
-    conn.commit()
-    conn.close()
-
+    # TRADES TABLE (🔥 MOVE THIS UP BEFORE CLOSE)
     c.execute("""
     CREATE TABLE IF NOT EXISTS trades (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -560,7 +559,7 @@ def init_db():
 
     conn.commit()
     conn.close()
- 
+    
 @app.route("/history")
 def history():
     if "user_id" not in session:
