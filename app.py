@@ -110,22 +110,16 @@ def login():
 
         conn.close()
 
-        if user is None:
-            error = "Username not found"
-
-        # 🔒 bcrypt password check
+    if user is None:
+          error = "Username not found"
+    else:
         stored_password = user["password"]
 
-        # ensure password from DB is bytes
         if isinstance(stored_password, str):
             stored_password = stored_password.encode("utf-8")
 
-        elif not bcrypt.checkpw(
-            password.encode("utf-8"),
-            stored_password
-        ):
+        if not bcrypt.checkpw(password.encode("utf-8"), stored_password):
             error = "Wrong password"
-
         else:
             session.clear()
 
@@ -267,15 +261,51 @@ def reset():
 @app.route("/confirm_trade", methods=["POST"])
 def confirm_trade():
 
+    if "user_id" not in session:
+        return redirect(url_for("login"))
+
     trade = session.get("pending_trade")
 
     if not trade:
-        return redirect(url_for("home"))
+        return "Error: No trade found. Please calculate risk again."
 
     conn = get_db_connection()
     cursor = conn.cursor()
 
     try:
+        user_id = session["user_id"]
+
+        # ================= DAILY LIMIT CHECK =================
+        cursor.execute(
+            "SELECT daily_trades, last_trade_date, plan FROM users WHERE id = ?",
+            (user_id,)
+        )
+        user = cursor.fetchone()
+
+        daily_trades = user["daily_trades"] or 0
+        last_trade_date = user["last_trade_date"]
+        plan = user["plan"]
+
+        today = datetime.now().date()
+
+        # Reset if new day
+        if not last_trade_date or str(last_trade_date) != str(today):
+            daily_trades = 0
+
+        # Limit free users
+        if plan == "free" and daily_trades >= 5:
+            return "Daily trade limit reached (5 trades). Upgrade to Pro."
+
+        # Update count
+        daily_trades += 1
+
+        cursor.execute("""
+            UPDATE users
+            SET daily_trades = ?, last_trade_date = ?
+            WHERE id = ?
+        """, (daily_trades, today, user_id))
+
+        # ================= SAVE TRADE =================
         cursor.execute("""
             INSERT INTO trades (
                 user_id,
@@ -288,7 +318,7 @@ def confirm_trade():
                 date
             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
         """, (
-            session["user_id"],
+            user_id,
             trade.get("pair"),
             trade.get("risk_percent"),
             trade.get("risk_amount"),
@@ -301,11 +331,10 @@ def confirm_trade():
         conn.commit()
 
     except Exception as e:
-        print("ERROR saving trade:", e)
-        return "Error saving trade"
-
-    finally:
         conn.close()
+        return f"Error saving trade: {str(e)}"
+
+    conn.close()
 
     session.pop("pending_trade", None)
 
