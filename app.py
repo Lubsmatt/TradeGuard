@@ -110,28 +110,29 @@ def login():
 
         conn.close()
 
-    if user is None:
-          error = "Username not found"
-    else:
-        stored_password = user["password"]
-
-        if isinstance(stored_password, str):
-            stored_password = stored_password.encode("utf-8")
-
-        if not bcrypt.checkpw(password.encode("utf-8"), stored_password):
-            error = "Wrong password"
+        # ✅ MOVE THIS BLOCK INSIDE POST
+        if user is None:
+            error = "Username not found"
         else:
-            session.clear()
+            stored_password = user["password"]
 
-            session["user_id"] = user["id"]
-            session["username"] = user["username"]
-            session["plan"] = user["plan"]
+            if isinstance(stored_password, str):
+                stored_password = stored_password.encode("utf-8")
 
-            session["trade_count"] = 0
-            session["daily_risk"] = 0
-            session["last_trade"] = False
+            if not bcrypt.checkpw(password.encode("utf-8"), stored_password):
+                error = "Wrong password"
+            else:
+                session.clear()
 
-            return redirect(url_for("home"))
+                session["user_id"] = user["id"]
+                session["username"] = user["username"]
+                session["plan"] = user["plan"]
+
+                session["trade_count"] = 0
+                session["daily_risk"] = 0
+                session["last_trade"] = False
+
+                return redirect(url_for("home"))
 
     return render_template("login.html", error=error)
 
