@@ -315,7 +315,7 @@ def confirm_trade():
                 rr_ratio,
                 reward,
                 result,
-                date
+                trade_date
             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
         """, (
             user_id,
@@ -549,24 +549,20 @@ def init_db():
         pass
 
     # TRADES TABLE (🔥 MOVE THIS UP BEFORE CLOSE)
-    c.execute("""
-    CREATE TABLE IF NOT EXISTS trades (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        user_id INTEGER,
-        pair TEXT,
-        risk_percent REAL,
-        risk_amount REAL,
-        rr_ratio REAL,
-        reward REAL,
-        result TEXT DEFAULT 'pending',
-        date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        FOREIGN KEY(user_id) REFERENCES users(id)
-        date = db.Column(db.Date, default=date.today)
-    )
+        c.execute("""
+        CREATE TABLE IF NOT EXISTS trades (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER,
+            pair TEXT,
+            risk_percent REAL,
+            risk_amount REAL,
+            rr_ratio REAL,
+            reward REAL,
+            result TEXT DEFAULT 'pending',
+            trade_date TEXT DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY(user_id) REFERENCES users(id)
+        )
     """)
-
-    conn.commit()
-    conn.close()
     
 @app.route("/history")
 def history():
