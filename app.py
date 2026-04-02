@@ -287,10 +287,9 @@ def confirm_trade():
         last_trade_date = user["last_trade_date"]
         plan = user["plan"]
 
-        today = datetime.now().date()
+        today = datetime.now().strftime("%Y-%m-%d")
 
-        # Reset if new day
-        if not last_trade_date or str(last_trade_date) != str(today):
+        if not last_trade_date or last_trade_date != today:
             daily_trades = 0
 
         # Limit free users
@@ -562,6 +561,7 @@ def init_db():
         result TEXT DEFAULT 'pending',
         date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY(user_id) REFERENCES users(id)
+        date = db.Column(db.Date, default=date.today)
     )
     """)
 
