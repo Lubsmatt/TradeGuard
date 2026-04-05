@@ -7,6 +7,19 @@ import bcrypt
 print("Database absolute path:", os.path.abspath("database.db"))
 
 app = Flask(__name__)
+app.secret_key = "tradeguard_secure_key_2026"
+
+@app.route("/debug_trades")
+def debug_trades():
+    conn = get_db_connection()
+    trades = conn.execute("SELECT risk_percent, date FROM trades").fetchall()
+    conn.close()
+
+    return str([dict(t) for t in trades])
+
+# ADD THESE 👇
+app.config["SESSION_PERMANENT"] = True
+
 DATABASE = "database.db"
 
 def get_db_connection():
@@ -128,9 +141,11 @@ def login():
                 session["username"] = user["username"]
                 session["plan"] = user["plan"]
 
-                session["trade_count"] = 0
                 session["daily_risk"] = 0
                 session["last_trade"] = False
+
+                # ADD THIS 👇
+                session.permanent = True
 
                 return redirect(url_for("home"))
 
@@ -147,17 +162,59 @@ def logout():
 # ===================== RISK CALCULATOR =====================
 @app.route("/risk", methods=["GET", "POST"])
 def risk():
+
+    print("SESSION DATA:", dict(session))
+
     if "user_id" not in session:
         return redirect(url_for("login"))
 
     result = None
     error = None
+    daily_risk_value = 0
 
-    if "daily_risk" not in session:
-        session["daily_risk"] = 0
+    # ===== ALWAYS GET DAILY RISK (WORKS FOR GET + POST) =====
+    conn = get_db_connection()
+    today = datetime.now().strftime("%Y-%m-%d")
 
+    daily_risk_db = conn.execute("""
+        SELECT SUM(risk_percent) as total
+        FROM trades
+        WHERE user_id = ? AND date LIKE ?
+    """, (session["user_id"], f"{today}%")).fetchone()
+
+    conn.close()
+
+    if daily_risk_db["total"]:
+        daily_risk_value = daily_risk_db["total"]
+    else:
+        daily_risk_value = 0
+
+    print("DAILY RISK FROM DB:", daily_risk_value)
+
+    # ===== HANDLE FORM =====
     if request.method == "POST":
         try:
+
+            # ===== DAILY TRADE LIMIT CHECK =====
+            conn = get_db_connection()
+
+            user = conn.execute(
+                "SELECT daily_trades, last_trade_date, plan FROM users WHERE id = ?",
+                (session["user_id"],)
+            ).fetchone()
+
+            conn.close()
+
+            today = datetime.now().strftime("%Y-%m-%d")
+            daily_trades = user["daily_trades"] or 0
+
+            if not user["last_trade_date"] or user["last_trade_date"] != today:
+                daily_trades = 0
+
+            if user["plan"] == "free" and daily_trades >= 5:
+                error = "Daily trade limit reached (5 trades). Upgrade to Pro."
+
+            # ===== GET FORM DATA =====
             balance = float(request.form["balance"])
             risk_percent = float(request.form["risk_percent"])
             sl = float(request.form["sl"])
@@ -166,7 +223,7 @@ def risk():
 
             pip_value = PAIR_VALUES.get(pair)
 
-            # ---- BASIC VALIDATIONS ----
+            # ===== VALIDATIONS =====
             if pip_value is None:
                 error = "Invalid trading pair selected."
 
@@ -176,46 +233,29 @@ def risk():
             elif sl <= 0 or tp <= 0:
                 error = "SL and TP must be greater than 0."
 
-            elif session["plan"] == "free" and risk_percent > 2:
-                error = "Free plan allows max 2% risk per trade. Upgrade to Pro."
-        
+            elif session["plan"] == "free" and risk_percent > 5:
+                error = "Free plan allows max 5% risk per trade."
 
-            # ---- TRADE COUNT CHECK ----
-            if error is None and session["plan"] == "free":
-                if "trade_count" not in session:
-                    session["trade_count"] = 0
-
-                if session["trade_count"] >= 3:
-                    error = "Free plan allows only 3 calculations per session. Upgrade to Pro."
-
-            # ---- DAILY LIMIT CHECK ----
+            # ===== CALCULATION =====
             if error is None:
-                if session["daily_risk"] + risk_percent > 5:
-                    error = "⚠️ Daily risk limit (5%) exceeded!"
-
-            # ---- CALCULATION ----
-            if error is None:
-
-                if session["plan"] == "free":
-                    session["trade_count"] += 1
 
                 risk_amount = balance * (risk_percent / 100)
                 lot = risk_amount / (sl * pip_value)
                 lot = round(lot, 4)
+
                 if lot < 0.01:
                     error = "Lot size too small. Increase risk or reduce stop loss."
-                reward = lot * tp * pip_value
-                reward = round(reward, 2)
+
+                reward = round(lot * tp * pip_value, 2)
                 position_size = lot * 100000
                 rr_ratio = round(tp / sl, 2)
 
-                session["daily_risk"] += risk_percent
                 session["last_trade"] = True
 
                 result = {
                     "pair": pair,
                     "risk_amount": round(risk_amount, 2),
-                    "lot": round (lot, 4),
+                    "lot": lot,
                     "reward": reward,
                     "rr_ratio": rr_ratio,
                     "position_size": round(position_size, 2)
@@ -230,6 +270,7 @@ def risk():
                 }
 
         except Exception as e:
+            print("RISK ERROR:", e)
             error = f"Error: {str(e)}"
 
     return render_template(
@@ -237,10 +278,9 @@ def risk():
         pairs=PAIR_VALUES.keys(),
         result=result,
         error=error,
-        daily_risk=session["daily_risk"]
+        daily_risk=daily_risk_value
     )
-         
-
+    
 # ===================== CHECKLIST =====================
 
 @app.route("/check")
@@ -305,6 +345,8 @@ def confirm_trade():
             WHERE id = ?
         """, (daily_trades, today, user_id))
 
+        print("TRADE DATA:", trade)
+
         # ================= SAVE TRADE =================
         cursor.execute("""
             INSERT INTO trades (
@@ -315,7 +357,7 @@ def confirm_trade():
                 rr_ratio,
                 reward,
                 result,
-                trade_date
+                date
             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
         """, (
             user_id,
@@ -543,26 +585,30 @@ def init_db():
     except:
         pass
 
+    # FIX trades table missing date column
     try:
-        c.execute("ALTER TABLE users ADD COLUMN last_trade_date TEXT")
+       c.execute("ALTER TABLE trades ADD COLUMN date TEXT")
     except:
-        pass
-
+           pass
+   
     # TRADES TABLE (🔥 MOVE THIS UP BEFORE CLOSE)
-        c.execute("""
-        CREATE TABLE IF NOT EXISTS trades (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            user_id INTEGER,
-            pair TEXT,
-            risk_percent REAL,
-            risk_amount REAL,
-            rr_ratio REAL,
-            reward REAL,
-            result TEXT DEFAULT 'pending',
-            trade_date TEXT DEFAULT CURRENT_TIMESTAMP,
-            FOREIGN KEY(user_id) REFERENCES users(id)
-        )
+    c.execute("""
+    CREATE TABLE IF NOT EXISTS trades (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER,
+        pair TEXT,
+        risk_percent REAL,
+        risk_amount REAL,
+        rr_ratio REAL,
+        reward REAL,
+        result TEXT DEFAULT 'pending',
+        date TEXT DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY(user_id) REFERENCES users(id)
+    )
     """)
+
+    conn.commit()
+    conn.close()
     
 @app.route("/history")
 def history():
