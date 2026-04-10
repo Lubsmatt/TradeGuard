@@ -106,11 +106,9 @@ def register():
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
-
     error = None
 
     if request.method == "POST":
-
         username = request.form["username"].strip()
         password = request.form["password"].strip()
 
@@ -123,17 +121,22 @@ def login():
 
         conn.close()
 
-        # ✅ MOVE THIS BLOCK INSIDE POST
-        if user is None:
+        # ❌ USER NOT FOUND
+        if not user:
             error = "Username not found"
+
         else:
             stored_password = user["password"]
 
+            # Ensure password is bytes
             if isinstance(stored_password, str):
                 stored_password = stored_password.encode("utf-8")
 
+            # ❌ WRONG PASSWORD
             if not bcrypt.checkpw(password.encode("utf-8"), stored_password):
                 error = "Wrong password"
+
+            # ✅ SUCCESS LOGIN
             else:
                 session.clear()
 
@@ -144,7 +147,6 @@ def login():
                 session["daily_risk"] = 0
                 session["last_trade"] = False
 
-                # ADD THIS 👇
                 session.permanent = True
 
                 return redirect(url_for("home"))
