@@ -6,13 +6,15 @@
 </head>
 <body style="font-family:Arial; background:#111; color:white;">
 
-<div style="width:600px; margin:60px auto; background:#222; padding:30px; border-radius:10px;">
+<div style="width:95%; max-width:1100px; margin:60px auto; background:#222; padding:30px; border-radius:10px;"></div>
 
 <h2>Trade Journal</h2>
 
 <div style="margin-top:20px; background:#333; padding:20px; border-radius:10px;">
 
 <h3>Performance Dashboard</h3>
+
+<a href="/monthly">📊 Monthly Dashboard</a>
 
 <p><strong>Total Trades:</strong> {{ total_trades }}</p>
 
@@ -112,32 +114,62 @@ new Chart(ctx, {
 </div>
 
 {% if trades %}
-    <table style="width:100%; margin-top:20px; border-collapse:collapse;">
+    <table style="
+        width:100%;
+        margin-top:20px;
+        border-collapse:collapse;
+        font-size:14px;
+    ">
+        <tr style="text-align:center;" onmouseover="this.style.background='#333'" onmouseout="this.style.background='transparent'"></tr>
         <tr style="background:#333;">
             <th>Pair</th>
             <th>Risk %</th>
             <th>Risk Amount</th>
+            <th>Reward</th>
             <th>R:R</th>
             <th>Result</th>
+            <th>Emotion</th>
+            <th>Confidence</th>
+            <th>Notes</th>
+            <th>Date</th>
         </tr>
 
-        {% for trade in trades %}
+{% for trade in trades %}
 <tr style="text-align:center;">
+
     <td>{{ trade.pair }}</td>
     <td>{{ trade.risk_percent }}%</td>
     <td>${{ trade.risk_amount }}</td>
+    <td>${{ trade.reward }}</td>
     <td>1 : {{ trade.rr_ratio }}</td>
+
+    <!-- RESULT (move this up) -->
     <td>
-       {% if trade.result == "pending" %}
-Pending
-<a href="/update_result/{{ trade.id }}/win">Win</a>
-<a href="/update_result/{{ trade.id }}/loss">Loss</a>
-
-{% else %}
-{{ trade.result }}
-
-{% endif %}
+        {% if trade.result == "pending" %}
+            Pending
+            <a href="/update_result/{{ trade.id }}/win">Win</a>
+            <a href="/update_result/{{ trade.id }}/loss">Loss</a>
+        {% elif trade.result == "win" %}
+            <span style="color:#4CAF50; font-weight:bold;">Win</span>
+        {% else %}
+            <span style="color:red; font-weight:bold;">Loss</span>
+        {% endif %}
     </td>
+
+    <!-- EMOTION -->
+    <td>{{ trade.emotion or "-" }}</td>
+
+    <!-- CONFIDENCE -->
+    <td>{{ trade.confidence or "-" }}</td>
+
+    <!-- NOTES (move this later so it doesn't break layout) -->
+    <td style="max-width:150px; word-wrap:break-word;">
+        {{ trade.notes or "-" }}
+    </td>
+
+    <!-- DATE LAST -->
+    <td>{{ trade.date }}</td>
+
 </tr>
 {% endfor %}
     </table>

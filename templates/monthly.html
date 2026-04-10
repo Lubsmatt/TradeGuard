@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>TradeGuard Dashboard</title>
+
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial;
+            background: #0f172a;
+            color: white;
+            display: flex;
+        }
+
+        /* SIDEBAR */
+        .sidebar {
+            width: 220px;
+            background: #020617;
+            height: 100vh;
+            padding: 20px;
+        }
+
+        .sidebar h2 {
+            color: #38bdf8;
+        }
+
+        .sidebar a {
+            display: block;
+            color: white;
+            text-decoration: none;
+            margin: 15px 0;
+        }
+
+        .sidebar a:hover {
+            color: #38bdf8;
+        }
+
+        /* MAIN CONTENT */
+        .main {
+            flex: 1;
+            padding: 20px;
+        }
+
+        /* CARDS */
+        .cards {
+            display: flex;
+            flex-wrap: wrap;
+        }
+
+        .card {
+            background: rgba(255,255,255,0.05);
+            backdrop-filter: blur(10px);
+            padding: 15px;
+            border-radius: 12px;
+            margin: 10px;
+            width: 180px;
+            text-align: center;
+            box-shadow: 0 0 10px rgba(0,0,0,0.3);
+        }
+
+        .green { color: #22c55e; }
+        .red { color: #ef4444; }
+
+        /* TABLE */
+        table {
+            width: 100%;
+            margin-top: 20px;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: center;
+        }
+
+        th {
+            background: #1e293b;
+        }
+
+        tr:nth-child(even) {
+            background: #111827;
+        }
+
+        input, button {
+            padding: 8px;
+            border-radius: 5px;
+            border: none;
+        }
+
+        button {
+            background: #38bdf8;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+    <h2>TradeGuard</h2>
+
+    <a href="/journal">📒 Journal</a>
+    <a href="/monthly">📊 Monthly</a>
+    <a href="/risk">⚖️ Risk Tool</a>
+    <a href="/upgrade">💎 Upgrade</a>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+<h2>📊 Monthly Dashboard</h2>
+
+<form method="POST">
+    <input type="month" name="month" required>
+    <button type="submit">Filter</button>
+</form>
+
+<!-- CHART -->
+<canvas id="equityChart" height="100"></canvas>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+const data = JSON.parse('{{ equity_data | tojson | safe }}');
+
+const ctx = document.getElementById('equityChart').getContext('2d');
+
+new Chart(ctx, {
+    type: 'line',
+    data: {
+        labels: data.map((_, i) => i + 1),
+        datasets: [{
+            label: 'Equity Curve',
+            data: data,
+            borderWidth: 2,
+            tension: 0.3
+        }]
+    }
+});
+</script>
+
+<!-- CARDS -->
+<div class="cards">
+    <div class="card"><h3>Total Trades</h3><p>{{ total_trades }}</p></div>
+    <div class="card"><h3>Win Rate</h3><p>{{ win_rate|round(2) }}%</p></div>
+    <div class="card"><h3>Profit</h3><p class="{{ 'green' if profit > 0 else 'red' }}">{{ profit }}</p></div>
+    <div class="card"><h3>Growth</h3><p>{{ growth|round(2) }}%</p></div>
+    <div class="card"><h3>Expectancy</h3><p class="{{ 'green' if expectancy > 0 else 'red' }}">{{ expectancy|round(2) }}</p></div>
+
+    <div class="card">
+        <h3>Best Day</h3>
+        <p>{{ best_day if best_day else "N/A" }} ({{ best_day_rate|round(1) if best_day_rate else 0 }}%)</p>
+    </div>
+
+    <div class="card">
+        <h3>Best Pair</h3>
+        <p>{{ best_pair if best_pair else "N/A" }} ({{ best_pair_rate|round(1) if best_pair_rate else 0 }}%)</p>
+    </div>
+
+    <div class="card">
+        <h3>Edge Score</h3>
+        <p class="{{ 'green' if edge_score > 0 else 'red' }}">{{ edge_score|round(2) }}</p>
+    </div>
+</div>
+
+<!-- TABLE -->
+<table>
+<tr>
+    <th>Pair</th>
+    <th>Result</th>
+    <th>Risk</th>
+    <th>Reward</th>
+    <th>Date</th>
+</tr>
+
+{% for trade in trades %}
+<tr>
+    <td>{{ trade.pair }}</td>
+    <td class="{{ 'green' if trade.result == 'win' else 'red' }}">{{ trade.result }}</td>
+    <td>{{ trade.risk_amount }}</td>
+    <td>{{ trade.reward }}</td>
+    <td>{{ trade.date }}</td>
+</tr>
+{% endfor %}
+
+</table>
+
+</div>
+
+</body>
+</html>

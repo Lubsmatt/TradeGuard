@@ -36,6 +36,24 @@
         Emotion Controlled
     </div>
 
+    <textarea name="notes" placeholder="Why did you take this trade?" 
+    style="width:100%; padding:10px; margin-top:10px;"></textarea>
+
+    <label>Emotion Before Trade:</label>
+    <select name="emotion" style="width:100%; padding:10px; margin-top:5px;">
+        <option value="confident">Confident</option>
+        <option value="neutral">Neutral</option>
+        <option value="fear">Fear</option>
+        <option value="greed">Greed</option>
+        <option value="revenge">Revenge</option>
+    </select>
+
+    <br><br>
+
+    <label>Confidence Level (1–10):</label>
+    <input type="number" name="confidence" min="1" max="10"
+        style="width:100%; padding:10px; margin-top:5px;">
+
     <button type="submit" id="confirmBtn"
         style="width:100%; padding:10px; background:gray; color:white; border:none;"
         disabled>

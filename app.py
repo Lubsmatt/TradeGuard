@@ -266,7 +266,8 @@ def risk():
                     "risk_percent": risk_percent,
                     "rr_ratio": rr_ratio,
                     "risk_amount": round(risk_amount, 2),
-                    "reward": reward
+                    "reward": reward,
+                    "notes": request.form.get("notes", "")
                 }
 
         except Exception as e:
@@ -306,6 +307,9 @@ def confirm_trade():
         return redirect(url_for("login"))
 
     trade = session.get("pending_trade")
+    emotion = request.form.get("emotion", "")
+    confidence = request.form.get("confidence", "")
+    notes = request.form.get("notes", "")
 
     if not trade:
         return "Error: No trade found. Please calculate risk again."
@@ -357,8 +361,11 @@ def confirm_trade():
                 rr_ratio,
                 reward,
                 result,
+                notes,
+                emotion,
+                confidence,                     
                 date
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """, (
             user_id,
             trade.get("pair"),
@@ -367,6 +374,9 @@ def confirm_trade():
             trade.get("rr_ratio"),
             trade.get("reward", 0),
             "pending",
+            notes,
+            emotion,
+            confidence,
             datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         ))
 
@@ -590,7 +600,7 @@ def init_db():
        c.execute("ALTER TABLE trades ADD COLUMN date TEXT")
     except:
            pass
-   
+     
     # TRADES TABLE (🔥 MOVE THIS UP BEFORE CLOSE)
     c.execute("""
     CREATE TABLE IF NOT EXISTS trades (
@@ -602,10 +612,26 @@ def init_db():
         rr_ratio REAL,
         reward REAL,
         result TEXT DEFAULT 'pending',
+        notes TEXT,     
         date TEXT DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY(user_id) REFERENCES users(id)
     )
     """)
+
+    try:
+       c.execute("ALTER TABLE trades ADD COLUMN notes TEXT")
+    except:
+        pass
+    
+    try:
+       c.execute("ALTER TABLE trades ADD COLUMN emotion TEXT")
+    except:
+        pass
+
+    try:
+       c.execute("ALTER TABLE trades ADD COLUMN confidence INTEGER")
+    except:
+        pass
 
     conn.commit()
     conn.close()
@@ -635,6 +661,163 @@ def history():
 import os
 
 init_db()  # runs when app starts on Render
+
+@app.route("/monthly", methods=["GET", "POST"])
+def monthly():
+    if "user_id" not in session:
+        return redirect(url_for("login"))
+    
+    # 🔒 PLAN CHECK
+    if session.get("plan") != "pro":
+        return redirect(url_for("upgrade"))
+
+    user_id = session["user_id"]
+    selected_month = request.form.get("month")
+
+    conn = sqlite3.connect("database.db")
+    conn.row_factory = sqlite3.Row
+    cursor = conn.cursor()
+
+    # 📊 FILTER BY MONTH
+    if selected_month:
+        cursor.execute("""
+            SELECT * FROM trades
+            WHERE user_id = ? AND strftime('%Y-%m', date) = ?
+        """, (user_id, selected_month))
+    else:
+        cursor.execute("""
+            SELECT * FROM trades
+            WHERE user_id = ?
+        """, (user_id,))
+
+    trades = cursor.fetchall()
+
+    # 📈 METRICS
+    total_trades = len(trades)
+    wins = 0
+    losses = 0
+    profit = 0
+
+    for trade in trades:
+        result = trade["result"].lower()
+
+        if result == "win":
+            wins += 1
+            profit += trade["reward"]
+
+        elif result == "loss":
+            losses += 1
+            profit -= trade["risk_amount"]
+
+    win_rate = (wins / total_trades * 100) if total_trades > 0 else 0
+
+    # 📊 EXPECTANCY
+    total_win_amount = 0
+    total_loss_amount = 0
+
+    for trade in trades:
+        result = trade["result"].lower()
+
+        if result == "win":
+            total_win_amount += trade["reward"]
+        elif result == "loss":
+            total_loss_amount += trade["risk_amount"]
+
+    avg_win = total_win_amount / wins if wins > 0 else 0
+    avg_loss = total_loss_amount / losses if losses > 0 else 0
+
+    win_rate_decimal = wins / total_trades if total_trades > 0 else 0
+    loss_rate_decimal = losses / total_trades if total_trades > 0 else 0
+
+    expectancy = (win_rate_decimal * avg_win) - (loss_rate_decimal * avg_loss)
+
+    # 📅 BEST TRADING DAY
+    from collections import defaultdict
+    from datetime import datetime
+
+    day_stats = defaultdict(lambda: {"wins": 0, "total": 0})
+
+    for trade in trades:
+        date_obj = datetime.strptime(trade["date"][:10], "%Y-%m-%d")
+        day_name = date_obj.strftime("%A")
+
+        result = trade["result"].lower()
+
+        day_stats[day_name]["total"] += 1
+        if result == "win":
+            day_stats[day_name]["wins"] += 1
+
+    best_day = None
+    best_day_rate = 0
+
+    for day, stats in day_stats.items():
+        if stats["total"] > 0:
+            rate = (stats["wins"] / stats["total"]) * 100
+            if rate > best_day_rate:
+                best_day_rate = rate
+                best_day = day
+
+    # 🏆 BEST PAIR
+    pair_stats = defaultdict(lambda: {"wins": 0, "total": 0})
+
+    for trade in trades:
+        pair = trade["pair"]
+        result = trade["result"].lower()
+
+        pair_stats[pair]["total"] += 1
+        if result == "win":
+            pair_stats[pair]["wins"] += 1
+
+    best_pair = None
+    best_pair_rate = 0
+
+    for pair, stats in pair_stats.items():
+        if stats["total"] > 0:
+            rate = (stats["wins"] / stats["total"]) * 100
+            if rate > best_pair_rate:
+                best_pair_rate = rate
+                best_pair = pair
+
+    # ⚡ EDGE SCORE
+    edge_score = (expectancy * 10) + win_rate
+
+    # 💰 GROWTH
+    starting_balance = 100
+    growth = (profit / starting_balance) * 100
+
+    # 📉 EQUITY CURVE
+    equity = 0
+    equity_data = []
+
+    for trade in trades:
+        result = trade["result"].lower()
+
+        if result == "win":
+            equity += trade["reward"]
+        elif result == "loss":
+            equity -= trade["risk_amount"]
+
+        equity_data.append(equity)
+
+    conn.close()
+
+    return render_template("monthly.html",
+                           trades=trades,
+                           total_trades=total_trades,
+                           win_rate=win_rate,
+                           profit=profit,
+                           growth=growth,
+                           equity_data=equity_data,
+                           expectancy=expectancy,
+                           best_day=best_day,
+                           best_day_rate=best_day_rate,
+                           best_pair=best_pair,
+                           best_pair_rate=best_pair_rate,
+                           edge_score=edge_score)
+
+@app.route("/upgrade")
+def upgrade():
+    return render_template("upgrade.html")
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
