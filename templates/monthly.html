@@ -1,100 +1,107 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TradeGuard Dashboard</title>
 
     <style>
+    body {
+        margin: 0;
+        font-family: Arial;
+        background: #0f172a;
+        color: white;
+        display: flex;
+    }
+
+    /* SIDEBAR */
+    .sidebar {
+        width: 220px;
+        background: #020617;
+        height: 100vh;
+        padding: 20px;
+        transition: 0.3s;
+    }
+
+    .sidebar h2 {
+        color: #38bdf8;
+    }
+
+    .sidebar a {
+        display: block;
+        color: white;
+        text-decoration: none;
+        margin: 15px 0;
+    }
+
+    /* MAIN */
+    .main {
+        flex: 1;
+        padding: 20px;
+    }
+
+    /* CARDS */
+    .cards {
+        display: flex;
+        flex-wrap: wrap;
+    }
+
+    .card {
+        background: rgba(255,255,255,0.05);
+        backdrop-filter: blur(10px);
+        padding: 15px;
+        border-radius: 12px;
+        margin: 10px;
+        width: 180px;
+        text-align: center;
+    }
+
+    /* TABLE */
+    table {
+        width: 100%;
+        margin-top: 20px;
+        border-collapse: collapse;
+    }
+
+    /* COLORS */
+    .green { color: #22c55e; }
+    .red { color: #ef4444; }
+
+    /* 📱 MOBILE STYLES */
+    @media (max-width: 768px) {
+
         body {
-            margin: 0;
-            font-family: Arial;
-            background: #0f172a;
-            color: white;
-            display: flex;
+            flex-direction: column;
         }
 
-        /* SIDEBAR */
         .sidebar {
-            width: 220px;
-            background: #020617;
-            height: 100vh;
-            padding: 20px;
+            width: 100%;
+            height: auto;
+            display: none; /* hidden by default */
         }
 
-        .sidebar h2 {
-            color: #38bdf8;
-        }
-
-        .sidebar a {
+        .sidebar.active {
             display: block;
-            color: white;
-            text-decoration: none;
-            margin: 15px 0;
         }
 
-        .sidebar a:hover {
-            color: #38bdf8;
-        }
-
-        /* MAIN CONTENT */
-        .main {
-            flex: 1;
-            padding: 20px;
-        }
-
-        /* CARDS */
         .cards {
-            display: flex;
-            flex-wrap: wrap;
+            justify-content: center;
         }
 
         .card {
-            background: rgba(255,255,255,0.05);
-            backdrop-filter: blur(10px);
-            padding: 15px;
-            border-radius: 12px;
-            margin: 10px;
-            width: 180px;
-            text-align: center;
-            box-shadow: 0 0 10px rgba(0,0,0,0.3);
+            width: 90%;
         }
 
-        .green { color: #22c55e; }
-        .red { color: #ef4444; }
-
-        /* TABLE */
         table {
-            width: 100%;
-            margin-top: 20px;
-            border-collapse: collapse;
+            font-size: 12px;
         }
-
-        th, td {
-            padding: 10px;
-            text-align: center;
-        }
-
-        th {
-            background: #1e293b;
-        }
-
-        tr:nth-child(even) {
-            background: #111827;
-        }
-
-        input, button {
-            padding: 8px;
-            border-radius: 5px;
-            border: none;
-        }
-
-        button {
-            background: #38bdf8;
-            cursor: pointer;
-        }
-    </style>
+}
+</style>
 </head>
 
 <body>
+    <button onclick="toggleMenu()" style="margin:10px;">
+☰ Menu
+</button>
 
 <!-- SIDEBAR -->
 <div class="sidebar">
@@ -186,6 +193,13 @@ new Chart(ctx, {
 </table>
 
 </div>
+
+<script>
+function toggleMenu() {
+    const sidebar = document.querySelector(".sidebar");
+    sidebar.classList.toggle("active");
+}
+</script>
 
 </body>
 </html>
