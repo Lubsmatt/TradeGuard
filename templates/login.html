@@ -1,8 +1,29 @@
-<form method="POST">
-    <input type="text" name="username" placeholder="Username" required>
-    <input type="password" name="password" placeholder="Password" required>
-    <button type="submit">Login</button>
-</form>
-{% if error %}
-<p style="color:red;">{{ error }}</p>
-{% endif %}
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="auth-container">
+
+    <div class="auth-box">
+        <h2>Welcome Back</h2>
+
+        <form method="POST" class="form-box">
+
+            <label>Username</label>
+            <input type="text" name="username" placeholder="Enter your username" required>
+
+            <label>Password</label>
+            <input type="password" name="password" placeholder="Enter your password" required>
+
+            <button type="submit">Login</button>
+
+        </form>
+
+        <p class="auth-link">
+            Don’t have an account? <a href="/register">Sign Up</a>
+        </p>
+    </div>
+
+</div>
+
+{% endblock %}

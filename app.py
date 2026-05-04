@@ -5,6 +5,8 @@ from datetime import datetime
 import os
 import bcrypt
 print("Database absolute path:", os.path.abspath("database.db"))
+import secrets
+from datetime import datetime, timedelta
 
 app = Flask(__name__)
 app.secret_key = "tradeguard_secure_key_2026"
@@ -84,13 +86,15 @@ def register():
             bcrypt.gensalt()
         )
 
+        email = request.form["email"]
+
         conn = get_db_connection()
         cursor = conn.cursor()
 
         try:
             cursor.execute(
-                "INSERT INTO users (username, password) VALUES (?, ?)",
-                (username, hashed_password)
+                "INSERT INTO users (username, password, email) VALUES (?, ?, ?)",
+                (username, hashed_password, email)
             )
             conn.commit()
             print("User saved:", username)
@@ -152,6 +156,74 @@ def login():
                 return redirect(url_for("home"))
 
     return render_template("login.html", error=error)
+
+@app.route("/forgot", methods=["GET", "POST"])
+def forgot():
+    if request.method == "POST":
+        email = request.form["email"]
+
+        conn = get_db_connection()
+        user = conn.execute(
+            "SELECT * FROM users WHERE email = ?",
+            (email,)
+        ).fetchone()
+
+        if user:
+            import secrets
+            from datetime import datetime, timedelta
+
+            token = secrets.token_hex(16)
+            expiry = datetime.now() + timedelta(minutes=10)
+
+            conn.execute(
+                "UPDATE users SET reset_token = ?, token_expiry = ? WHERE email = ?",
+                (token, expiry, email)
+            )
+            conn.commit()
+
+            # 🔥 FORCE PRINT
+            print("\n\n===== RESET LINK =====")
+            print(f"http://127.0.0.1:5000/reset/{token}")
+            print("======================\n\n")
+
+        else:
+            print("❌ EMAIL NOT FOUND")
+
+        conn.close()
+
+        return "Check terminal for reset link"
+
+    return render_template("forgot.html")
+
+@app.route("/reset/<token>", methods=["GET", "POST"])
+def reset_password(token):
+
+    conn = get_db_connection()
+
+    user = conn.execute(
+        "SELECT * FROM users WHERE reset_token = ?",
+        (token,)
+    ).fetchone()
+
+    if not user:
+        return "Invalid token"
+
+    if request.method == "POST":
+        new_password = request.form["password"]
+
+        hashed = bcrypt.hashpw(new_password.encode("utf-8"), bcrypt.gensalt())
+
+        conn.execute(
+            "UPDATE users SET password = ?, reset_token = NULL WHERE id = ?",
+            (hashed, user["id"])
+        )
+        conn.commit()
+        conn.close()
+
+        return redirect("/login")
+
+    conn.close()
+    return render_template("reset.html")
 
     # ===================== LOGOUT =====================
 
@@ -298,7 +370,7 @@ def check():
 # ===================== RESET DAILY RISK =====================
 
 @app.route("/reset")
-def reset():
+def clear_risk():
     session["daily_risk"] = 0
     return redirect(url_for("risk"))
 
@@ -617,6 +689,7 @@ def init_db():
         notes TEXT,     
         date TEXT DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY(user_id) REFERENCES users(id)
+        
     )
     """)
 
@@ -632,6 +705,21 @@ def init_db():
 
     try:
        c.execute("ALTER TABLE trades ADD COLUMN confidence INTEGER")
+    except:
+        pass
+
+    try:
+       c.execute("ALTER TABLE users ADD COLUMN email TEXT;")
+    except:
+        pass
+
+    try:
+       c.execute("ALTER TABLE users ADD COLUMN reset_token TEXT;")
+    except:
+        pass
+
+    try:
+       c.execute("ALTER TABLE users ADD COLUMN token_expiry TEXT;")
     except:
         pass
 
@@ -668,10 +756,7 @@ init_db()  # runs when app starts on Render
 def monthly():
     if "user_id" not in session:
         return redirect(url_for("login"))
-    
-    # 🔒 PLAN CHECK
-    if session.get("plan") != "pro":
-        return redirect(url_for("upgrade"))
+
 
     user_id = session["user_id"]
     selected_month = request.form.get("month")

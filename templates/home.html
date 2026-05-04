@@ -1,11 +1,37 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Home</title>
-</head>
-<body style="font-family:Arial; text-align:center; margin-top:100px;">
-    <h1>Welcome Back</h1>
-    <p>Your Plan: {{ session.plan }}</p>
-    <a href="/risk">Go to Risk Calculator</a>
-</body>
-</html>
+{% extends "base.html" %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+
+<h2>👋 Welcome, {{ session.username }}</h2>
+
+<div class="cards">
+
+    <div class="card">
+        <h3>📊 Monthly Stats</h3>
+        <p>Track your performance</p>
+        <a href="/monthly">Open</a>
+    </div>
+
+    <div class="card">
+        <h3>📒 Journal</h3>
+        <p>View your trades</p>
+        <a href="/journal">Open</a>
+    </div>
+
+    <div class="card">
+        <h3>⚖️ Risk Tool</h3>
+        <p>Manage your risk</p>
+        <a href="/risk">Open</a>
+    </div>
+
+    <div class="card">
+        <h3>💎 Upgrade</h3>
+        <p>Unlock premium features</p>
+        <a href="/upgrade">Upgrade</a>
+    </div>
+
+</div>
+
+{% endblock %}

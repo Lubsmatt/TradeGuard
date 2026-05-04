@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}TradeGuard{% endblock %}</title>
+
+    <style>
+    
+    * {
+        box-sizing: border-box;
+    }
+
+    canvas {
+        width: 100% !important;
+        max-width: 100%;
+        height: auto !important;
+    }
+
+    body {
+        margin: 0;
+        font-family: Arial;
+        background: #0f172a;
+        color: white;
+        display: flex;
+    }
+
+    .menu-btn {
+        position: fixed;
+        top: -5px;
+        left: 15px;
+        background: #38bdf8;
+        border: none;
+        padding: 10px 12px;
+        border-radius: 8px;
+        color: black;
+        font-size: 18px;
+        cursor: pointer;
+        z-index: 1000;
+    }
+
+    .form-box {
+        max-width: 350px;
+        margin: 60px auto;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .form-box label {
+        margin-top: 10px;
+        margin-bottom: 5px;
+        font-size: 14px;
+        color: #cbd5f5;
+    }
+
+    .form-box input {
+        padding: 10px;
+        border-radius: 8px;
+        border: none;
+        margin-bottom: 10px;
+        background: #1e293b;
+        color: white;
+    }
+
+    .form-box input::placeholder {
+        color: #94a3b8;
+    }
+
+    .form-box button {
+        margin-top: 15px;
+        padding: 10px;
+        border: none;
+        border-radius: 8px;
+        background: #38bdf8;
+        color: black;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+    .form-box button:hover {
+        background: #0ea5e9;
+    }  
+
+    body {
+        margin: 0;
+        font-family: Arial;
+        background: #0f172a;
+        color: white;
+    }
+
+    /* CENTER CONTAINER */
+    .auth-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+    }
+
+    /* BOX */
+    .auth-box {
+        background: rgba(255,255,255,0.05);
+        backdrop-filter: blur(10px);
+        padding: 30px;
+        border-radius: 15px;
+        width: 320px;
+        box-shadow: 0 0 20px rgba(0,0,0,0.3);
+        text-align: center;
+    }
+
+    /* TITLE */
+    .auth-box h2 {
+        margin-bottom: 20px;
+        color: #38bdf8;
+    }
+
+    /* FORM */
+    .form-box {
+        display: flex;
+        flex-direction: column;
+    }
+
+    /* LABELS */
+    .form-box label {
+        text-align: left;
+        margin-top: 10px;
+        font-size: 14px;
+        color: #cbd5f5;
+    }
+
+    /* INPUTS */
+    .form-box input {
+        padding: 10px;
+        border-radius: 8px;
+        border: none;
+        margin-top: 5px;
+        background: #1e293b;
+        color: white;
+    }
+
+    /* PLACEHOLDER */
+    .form-box input::placeholder {
+        color: #94a3b8;
+    }
+
+    /* BUTTON */
+    .form-box button {
+        margin-top: 20px;
+        padding: 10px;
+        border: none;
+        border-radius: 8px;
+        background: #38bdf8;
+        color: black;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+    .form-box button:hover {
+        background: #0ea5e9;
+    }
+
+    /* LINK */
+    .auth-link {
+        margin-top: 15px;
+        font-size: 14px;
+    }
+
+    .auth-link a {
+        color: #38bdf8;
+        text-decoration: none;
+    }
+
+    /* SIDEBAR */
+    .sidebar {
+        width: 200px;
+        background: #020617;
+        height: 100vh;
+        padding: 20px;
+        position: fixed;
+        left: -220;
+        top: 0;
+        transition: 0.3s;
+    }
+
+    .sidebar.active {
+        left: 0;
+    }
+
+    .sidebar h2 {
+        color: #38bdf8;
+    }
+
+    .sidebar a {
+        display: block;
+        color: white;
+        text-decoration: none;
+        margin: 15px 0;
+    }
+
+    .sidebar a.active {
+        color: #38bdf8;
+    }
+
+    /* MAIN */
+    .main {
+        flex: 1;
+        padding: 20px;
+        margin-left: 240px;
+        width: calc(100% - 240px);
+        max-width: 100%;
+        overflow-x: hidden;
+    }
+
+    /* CARDS */
+    .cards {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .card {
+        flex: 1 1 45%;
+        max-width: 100%;
+        background: rgba(255,255,255,0.05);
+        backdrop-filter: blur(10px);
+        padding: 15px;
+        border-radius: 12px;
+        text-align: center;
+        transition: 0.2s;
+    }
+
+    .card:hover {
+        transform: translateY(-5px);
+    }
+
+    /* TABLE */
+    table {
+        width: 100%;
+        margin-top: 20px;
+        border-collapse: collapse;
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+    }
+
+    th, td {
+        padding: 10px;
+        text-align: center;
+    }
+
+    th {
+        background: #1e293b;
+    }
+
+    tr:nth-child(even) {
+        background: #111827;
+    }
+
+    /* COLORS */
+    .green { color: #22c55e; }
+    .red { color: #ef4444; }
+
+    /* MOBILE */
+    @media (max-width: 768px) {
+
+        body {
+            flex-direction: column;
+        }
+
+        .main {
+            margin-left: 0;
+            width: 100%;
+            padding: 15px;
+        }
+
+        .sidebar {
+            left: -220px;
+        }
+
+        .sidebar.active {
+            left: 0;
+        }
+
+        .cards {
+            justify-content: center;
+        }
+
+        .card {
+            width: 90%;
+        }
+
+        .card {
+            flex: 1 1 100%;
+        }
+
+        table {
+            font-size: 12px;
+        }
+    }
+
+    canvas {
+        max-width: 100%;
+        height: 250px !important;
+    }
+
+    /* LOADER */
+    #loader {
+        position: fixed;
+        width: 100%;
+        height: 100%;
+        background: #0f172a;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+    }
+
+    .loader-circle {
+        width: 50px;
+        height: 50px;
+        border: 5px solid #1e293b;
+        border-top: 5px solid #38bdf8;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+        100% { transform: rotate(360deg); }
+    }
+
+    /* LANDING PAGE */
+    .landing {
+        width: 100%;
+        text-align: center;
+    }
+
+    /* HERO */
+    .hero {
+        margin-top: 100px;
+    }
+
+    .hero h1 {
+        font-size: 40px;
+        color: #38bdf8;
+    }
+
+    .hero p {
+        font-size: 18px;
+        color: #cbd5f5;
+        margin: 10px 0 20px;
+    }
+
+    /* BUTTONS */
+    .hero-buttons {
+        margin-top: 20px;
+    }
+
+    .btn-primary {
+        background: #38bdf8;
+        padding: 12px 20px;
+        border-radius: 8px;
+        color: black;
+        text-decoration: none;
+        margin-right: 10px;
+        font-weight: bold;
+    }
+
+    .btn-secondary {
+        background: transparent;
+        border: 1px solid #38bdf8;
+        padding: 12px 20px;
+        border-radius: 8px;
+        color: #38bdf8;
+        text-decoration: none;
+    }
+
+    /* FEATURES */
+    .features {
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+        margin-top: 60px;
+        flex-wrap: wrap;
+    }
+
+    .feature {
+        background: rgba(255,255,255,0.05);
+        padding: 20px;
+        border-radius: 12px;
+        width: 250px;
+    }
+
+    </style>
+</head>
+
+<body>
+
+<div id="loader">
+    <div class="loader-circle"></div>
+</div>
+
+<button onclick="toggleMenu()" class="menu-btn">☰</button>
+
+<script>
+function toggleMenu() {
+    const sidebar = document.querySelector(".sidebar");
+
+    if (!sidebar) {
+        console.log("Sidebar not found");
+        return;
+    }
+
+    sidebar.classList.toggle("active");
+}
+</script>
+
+{% if request.path != '/' %}
+<!-- SIDEBAR -->
+<div class="sidebar">
+    <h2>TradeGuard</h2>
+
+    <a href="/journal" class="{% if request.path == '/journal' %}active{% endif %}">📒 Journal</a>
+    <a href="/monthly" class="{% if request.path == '/monthly' %}active{% endif %}">📊 Monthly</a>
+    <a href="/risk" class="{% if request.path == '/risk' %}active{% endif %}">⚖️ Risk Tool</a>
+    <a href="/upgrade" class="{% if request.path == '/upgrade' %}active{% endif %}">💎 Upgrade</a>
+</div>
+{% endif %}
+
+<!-- MAIN CONTENT -->
+<div class="main">
+    {% block content %}{% endblock %}
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+
+    // Hide loader when page fully loads
+    window.addEventListener("load", function() {
+        document.getElementById("loader").style.display = "none";
+    });
+
+    // Fix back button loader bug
+    window.addEventListener("pageshow", function() {
+        document.getElementById("loader").style.display = "none";
+    });
+
+    // Show loader on navigation
+    document.querySelectorAll("a").forEach(link => {
+        link.addEventListener("click", function() {
+            document.getElementById("loader").style.display = "flex";
+        });
+    });
+
+});
+</script>
+
+</body>
+
+</html>

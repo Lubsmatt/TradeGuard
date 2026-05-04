@@ -1,122 +1,11 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TradeGuard Dashboard</title>
+{% extends "base.html" %}
 
-    <style>
-    body {
-        margin: 0;
-        font-family: Arial;
-        background: #0f172a;
-        color: white;
-        display: flex;
-    }
+{% block title %}Monthly Dashboard{% endblock %}
 
-    /* SIDEBAR */
-    .sidebar {
-        width: 220px;
-        background: #020617;
-        height: 100vh;
-        padding: 20px;
-        transition: 0.3s;
-    }
+{% block content %}
 
-    .sidebar h2 {
-        color: #38bdf8;
-    }
 
-    .sidebar a {
-        display: block;
-        color: white;
-        text-decoration: none;
-        margin: 15px 0;
-    }
-
-    /* MAIN */
-    .main {
-        flex: 1;
-        padding: 20px;
-    }
-
-    /* CARDS */
-    .cards {
-        display: flex;
-        flex-wrap: wrap;
-    }
-
-    .card {
-        background: rgba(255,255,255,0.05);
-        backdrop-filter: blur(10px);
-        padding: 15px;
-        border-radius: 12px;
-        margin: 10px;
-        width: 180px;
-        text-align: center;
-    }
-
-    /* TABLE */
-    table {
-        width: 100%;
-        margin-top: 20px;
-        border-collapse: collapse;
-    }
-
-    /* COLORS */
-    .green { color: #22c55e; }
-    .red { color: #ef4444; }
-
-    /* 📱 MOBILE STYLES */
-    @media (max-width: 768px) {
-
-        body {
-            flex-direction: column;
-        }
-
-        .sidebar {
-            width: 100%;
-            height: auto;
-            display: none; /* hidden by default */
-        }
-
-        .sidebar.active {
-            display: block;
-        }
-
-        .cards {
-            justify-content: center;
-        }
-
-        .card {
-            width: 90%;
-        }
-
-        table {
-            font-size: 12px;
-        }
-}
-</style>
-</head>
-
-<body>
-    <button onclick="toggleMenu()" style="margin:10px;">
-☰ Menu
-</button>
-
-<!-- SIDEBAR -->
-<div class="sidebar">
-    <h2>TradeGuard</h2>
-
-    <a href="/journal">📒 Journal</a>
-    <a href="/monthly">📊 Monthly</a>
-    <a href="/risk">⚖️ Risk Tool</a>
-    <a href="/upgrade">💎 Upgrade</a>
-</div>
-
-<!-- MAIN -->
-<div class="main">
-
-<h2>📊 Monthly Dashboard</h2>
+<h2 style="margin-top: 20px;">📊 Monthly Dashboard</h2>
 
 <form method="POST">
     <input type="month" name="month" required>
@@ -124,7 +13,15 @@
 </form>
 
 <!-- CHART -->
-<canvas id="equityChart" height="100"></canvas>
+<div style="margin-top:20px;">
+    <canvas id="equityChart"></canvas>
+</div>
+ 
+
+
+<div class="chart-container">
+    <canvas id="equityChart"></canvas>
+</div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
@@ -171,6 +68,7 @@ new Chart(ctx, {
 </div>
 
 <!-- TABLE -->
+<div class="table-container">
 <table>
 <tr>
     <th>Pair</th>
@@ -189,17 +87,7 @@ new Chart(ctx, {
     <td>{{ trade.date }}</td>
 </tr>
 {% endfor %}
-
 </table>
-
 </div>
 
-<script>
-function toggleMenu() {
-    const sidebar = document.querySelector(".sidebar");
-    sidebar.classList.toggle("active");
-}
-</script>
-
-</body>
-</html>
+{% endblock %}

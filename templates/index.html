@@ -1,23 +1,42 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>TradeGuard</title>
-</head>
-<body style="font-family:Arial; text-align:center; margin-top:100px; background:#111; color:white;">
-    
-   <a href="/login">Login</a> |
-   <a href="/register">Register</a> |
-   <a href="/logout">Logout</a>
-   <hr>
+{% extends "base.html" %}
 
-    <h1>TradeGuard</h1>
-    <p>Professional Risk Management System</p>
+{% block title %}TradeGuard - Trade Smarter{% endblock %}
 
-    <a href="/risk">
-        <button style="padding:12px 25px; font-size:16px;">
-            Open Risk Calculator
-        </button>
-    </a>
+{% block content %}
 
-</body>
-</html>
+<div class="landing">
+
+    <!-- HERO -->
+    <div class="hero">
+        <h1>Trade Smarter. Grow Faster.</h1>
+        <p>Track your trades, control risk, and build a winning strategy.</p>
+
+        <div class="hero-buttons">
+            <a href="/register" class="btn-primary">Get Started</a>
+            <a href="/login" class="btn-secondary">Login</a>
+        </div>
+    </div>
+
+    <!-- FEATURES -->
+    <div class="features">
+
+        <div class="feature">
+            <h3>📊 Smart Analytics</h3>
+            <p>See your win rate, growth, and performance clearly.</p>
+        </div>
+
+        <div class="feature">
+            <h3>⚖️ Risk Control</h3>
+            <p>Never over-risk again with built-in risk limits.</p>
+        </div>
+
+        <div class="feature">
+            <h3>📒 Trade Journal</h3>
+            <p>Track every trade and improve your strategy.</p>
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}
