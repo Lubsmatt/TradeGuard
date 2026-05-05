@@ -388,6 +388,129 @@
         width: 250px;
     }
 
+    /* LANDING PAGE */
+
+    .landing {
+        text-align: center;
+        padding: 40px 20px;
+    }
+
+    .hero h1 {
+        font-size: 36px;
+        margin-bottom: 10px;
+    }
+
+    .hero p {
+        color: #cbd5f5;
+        margin-bottom: 20px;
+    }
+
+    .hero-buttons {
+        margin-top: 20px;
+    }
+
+    .btn-primary {
+        background: #38bdf8;
+        color: black;
+        padding: 12px 20px;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: bold;
+        margin-right: 10px;
+    }
+
+    .btn-secondary {
+        background: transparent;
+        border: 1px solid #38bdf8;
+        color: #38bdf8;
+        padding: 12px 20px;
+        border-radius: 8px;
+        text-decoration: none;
+    }
+
+    .features {
+        margin-top: 50px;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 20px;
+    }
+
+    .feature {
+        background: rgba(255,255,255,0.05);
+        padding: 20px;
+        border-radius: 12px;
+        max-width: 250px;
+    }
+
+    .why {
+        margin-top: 60px;
+    }
+
+    .cta {
+        margin-top: 60px;
+    }
+
+    /* UPGRADE PAGE */
+
+    .upgrade-container {
+        text-align: center;
+        padding: 40px 20px;
+    }
+
+    .sub {
+        color: #94a3b8;
+        margin-bottom: 30px;
+    }
+
+    .pricing-card {
+        background: rgba(255,255,255,0.05);
+        padding: 30px;
+        border-radius: 15px;
+        max-width: 350px;
+        margin: auto;
+        backdrop-filter: blur(10px);
+    }
+
+    .pricing-card h2 {
+        color: #38bdf8;
+    }
+
+    .pricing-card h3 {
+        margin: 10px 0;
+    }
+
+    .pricing-card ul {
+        list-style: none;
+        padding: 0;
+        margin: 20px 0;
+    }
+
+    .pricing-card li {
+        margin: 10px 0;
+    }
+
+    .btn-upgrade {
+        display: inline-block;
+        margin-top: 20px;
+        padding: 12px 20px;
+        background: #38bdf8;
+        color: black;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: bold;
+    }
+
+    .btn-upgrade:hover {
+        background: #0ea5e9;
+    }
+
+    .free-note {
+        margin-top: 20px;
+        font-size: 14px;
+        color: #94a3b8;
+    }
+
     </style>
 </head>
 
@@ -397,7 +520,9 @@
     <div class="loader-circle"></div>
 </div>
 
+{% if session.get("user_id") %}
 <button onclick="toggleMenu()" class="menu-btn">☰</button>
+{% endif %} 
 
 <script>
 function toggleMenu() {
@@ -412,8 +537,7 @@ function toggleMenu() {
 }
 </script>
 
-{% if request.path != '/' %}
-<!-- SIDEBAR -->
+{% if session.get("user_id") %}
 <div class="sidebar">
     <h2>TradeGuard</h2>
 
@@ -421,6 +545,7 @@ function toggleMenu() {
     <a href="/monthly" class="{% if request.path == '/monthly' %}active{% endif %}">📊 Monthly</a>
     <a href="/risk" class="{% if request.path == '/risk' %}active{% endif %}">⚖️ Risk Tool</a>
     <a href="/upgrade" class="{% if request.path == '/upgrade' %}active{% endif %}">💎 Upgrade</a>
+    <a href="/logout">🚪 Logout</a>
 </div>
 {% endif %}
 
