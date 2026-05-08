@@ -1,53 +1,155 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Upgrade</title>
-    <style>
-        body {
-            background: #0f172a;
-            color: white;
-            text-align: center;
-            font-family: Arial;
-            padding: 50px;
-        }
+{% extends "base.html" %}
 
-        .box {
-            background: #1e293b;
-            padding: 30px;
-            border-radius: 10px;
-            display: inline-block;
-        }
+{% block title %}Upgrade{% endblock %}
 
-        button {
-            padding: 10px 20px;
-            background: #38bdf8;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-    </style>
-</head>
+{% block content %}
 
-<body>
+<div class="upgrade-container">
 
-<div class="box">
-    <h2>🚀 Upgrade to Pro</h2>
-    <p>Unlock full analytics:</p>
+    <div class="upgrade-card">
 
-    <ul style="text-align:left;">
-        <li>📈 Equity Curve</li>
-        <li>🧠 Expectancy</li>
-        <li>📅 Best Trading Day</li>
-        <li>🏆 Best Pair</li>
-        <li>⚡ Edge Score</li>
-    </ul>
+        <h1>Upgrade to Pro</h1>
 
-    <h3>$10/month</h3>
+        <p class="subtitle">
+            Unlock advanced analytics, unlimited tracking,
+            monthly dashboards and future AI features.
+        </p>
 
-    <button onclick="alert('Payment coming soon')">
-        Upgrade Now
-    </button>
+        <div class="price-box">
+            <h2>$10<span>/month</span></h2>
+            <p>3-day free trial included</p>
+        </div>
+
+        <ul class="features">
+            <li>✅ Monthly Dashboard</li>
+            <li>✅ Advanced Analytics</li>
+            <li>✅ Unlimited Journal Entries</li>
+            <li>✅ Future AI Trade Insights</li>
+            <li>✅ Priority Features</li>
+        </ul>
+
+        <button class="upgrade-btn" onclick="openCheckout()">
+            Upgrade Now
+        </button>
+
+    </div>
+
 </div>
 
-</body>
-</html>
+<!-- PADDLE -->
+<script src="https://cdn.paddle.com/paddle/v2/paddle.js"></script>
+
+<script>
+Paddle.Initialize({
+    token: "test_e6166328b0716b8a9f40868627f"
+});
+
+function openCheckout() {
+
+    Paddle.Checkout.open({
+        items: [
+            {
+                priceId: "pri_01kr3j528n27ewjmc8s9bwa0ev",
+                quantity: 1
+            }
+        ]
+    });
+
+}
+</script>
+
+<style>
+
+.upgrade-container{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    min-height:80vh;
+}
+
+.upgrade-card{
+    width:400px;
+    background:rgba(255,255,255,0.05);
+    backdrop-filter:blur(10px);
+    border-radius:20px;
+    padding:40px;
+    text-align:center;
+    box-shadow:0 0 25px rgba(0,0,0,0.3);
+}
+
+.upgrade-card h1{
+    color:#38bdf8;
+    font-size:38px;
+    margin-bottom:10px;
+}
+
+.subtitle{
+    color:#cbd5e1;
+    margin-bottom:30px;
+    line-height:1.6;
+}
+
+.price-box{
+    margin-bottom:30px;
+}
+
+.price-box h2{
+    font-size:50px;
+    margin:0;
+}
+
+.price-box span{
+    font-size:20px;
+    color:#94a3b8;
+}
+
+.price-box p{
+    color:#22c55e;
+}
+
+.features{
+    list-style:none;
+    padding:0;
+    text-align:left;
+    margin-bottom:30px;
+}
+
+.features li{
+    margin:15px 0;
+    font-size:16px;
+}
+
+.upgrade-btn{
+    width:100%;
+    padding:15px;
+    border:none;
+    border-radius:12px;
+    background:#38bdf8;
+    color:black;
+    font-size:18px;
+    font-weight:bold;
+    cursor:pointer;
+    transition:0.3s;
+}
+
+.upgrade-btn:hover{
+    background:#0ea5e9;
+    transform:scale(1.03);
+}
+
+@media(max-width:768px){
+
+    .upgrade-card{
+        width:90%;
+        padding:30px 20px;
+    }
+
+    .price-box h2{
+        font-size:40px;
+    }
+
+}
+
+</style>
+
+{% endblock %}
