@@ -28,9 +28,9 @@
             <li>✅ Priority Features</li>
         </ul>
 
-        <button class="upgrade-btn" onclick="openCheckout()">
-            Upgrade Now
-        </button>
+       <button class="upgrade-btn" onclick="openCheckout()">
+           Upgrade Now
+       </button>
 
     </div>
 
@@ -40,6 +40,9 @@
 <script src="https://cdn.paddle.com/paddle/v2/paddle.js"></script>
 
 <script>
+
+Paddle.Environment.set("sandbox");
+
 Paddle.Initialize({
     token: "test_e6166328b0716b8a9f40868627f"
 });
@@ -52,10 +55,15 @@ function openCheckout() {
                 priceId: "pri_01kr3j528n27ewjmc8s9bwa0ev",
                 quantity: 1
             }
-        ]
+        ],
+        settings: {
+            displayMode: "overlay",
+            theme: "dark"
+        }
     });
 
 }
+
 </script>
 
 <style>

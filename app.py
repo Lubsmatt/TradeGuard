@@ -905,6 +905,18 @@ def monthly():
                            best_pair_rate=best_pair_rate,
                            edge_score=edge_score)
 
+@app.route("/terms")
+def terms():
+    return render_template("terms.html")
+
+@app.route("/privacy")
+def privacy():
+    return render_template("privacy.html")
+
+@app.route("/refund")
+def refund():
+    return render_template("refund.html")
+
 @app.route("/upgrade")
 def upgrade():
     return render_template("upgrade.html")
