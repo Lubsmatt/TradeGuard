@@ -37,14 +37,13 @@
 </div>
 
 <!-- PADDLE -->
-<script src="https://cdn.paddle.com/paddle/v2/paddle.js"></script>
+
+ <script src="https://cdn.paddle.com/paddle/v2/paddle.js"></script>
 
 <script>
 
-Paddle.Environment.set("sandbox");
-
 Paddle.Initialize({
-    token: "test_e6166328b0716b8a9f40868627f"
+    token: "live_9aad0d3d3042cb9b8c3585b6af7"
 });
 
 function openCheckout() {
@@ -52,14 +51,10 @@ function openCheckout() {
     Paddle.Checkout.open({
         items: [
             {
-                priceId: "pri_01kr3j528n27ewjmc8s9bwa0ev",
+                priceId: "pri_01kreg5ffks3vx7awkjf0jhzf8",
                 quantity: 1
             }
-        ],
-        settings: {
-            displayMode: "overlay",
-            theme: "dark"
-        }
+        ]
     });
 
 }
