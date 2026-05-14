@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en"></html>
+<html lang="en">
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}TradeGuard{% endblock %}</title>
@@ -85,6 +85,8 @@
         font-family: Arial;
         background: #0f172a;
         color: white;
+        display: flex;
+        overflow-x: hidden;
     }
 
     /* CENTER CONTAINER */
@@ -175,9 +177,10 @@
         height: 100vh;
         padding: 20px;
         position: fixed;
-        left: -220;
+        left: -220px;
         top: 0;
         transition: 0.3s;
+        z-index: 999;
     }
 
     .sidebar.active {
@@ -259,6 +262,16 @@
     .red { color: #ef4444; }
 
     /* MOBILE */
+
+    .main {
+        flex: 1;
+        padding: 20px;
+        margin-left: 220px;
+        width: calc(100% - 220px);
+        max-width: 100%;
+        overflow-x: hidden;
+    }
+
     @media (max-width: 768px) {
 
         body {
