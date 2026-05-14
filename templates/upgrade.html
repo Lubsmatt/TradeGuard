@@ -38,7 +38,7 @@
 
 <!-- PADDLE -->
 
- <script src="https://cdn.paddle.com/paddle/v2/paddle.js"></script>
+<script src="https://cdn.paddle.com/paddle/v2/paddle.js"></script>
 
 <script>
 
@@ -46,20 +46,31 @@ Paddle.Initialize({
     token: "live_9aad0d3d3042cb9b8c3585b6af7"
 });
 
+console.log("Opening checkout...");
+console.log(Paddle);
+
 function openCheckout() {
 
-    Paddle.Checkout.open({
-        items: [
-            {
-                priceId: "pri_01kreg5ffks3vx7awkjf0jhzf8",
-                quantity: 1
-            }
-        ]
-    });
+    try {
+
+        Paddle.Checkout.open({
+            items: [
+                {
+                    priceId: "pri_01kreg5ffks3vx7awkjf0jhzf8",
+                    quantity: 1
+                }
+            ]
+        });
+
+    } catch(error) {
+
+        console.log("PADDLE ERROR:", error);
+
+    }
 
 }
 
-</script>
+</script>  
 
 <style>
 
