@@ -21,7 +21,6 @@
         font-family: Arial;
         background: #0f172a;
         color: white;
-        display: flex;
     }
 
     .menu-btn {
@@ -85,7 +84,6 @@
         font-family: Arial;
         background: #0f172a;
         color: white;
-        display: flex;
         overflow-x: hidden;
     }
 
@@ -204,31 +202,24 @@
 
     /* MAIN */
     .main {
-        flex: 1;
         width: 100%;
-        max-width: 100%;
+        min-height: 100vh;
         padding: 20px;
-        overflow-x: hidden;
-        transition: 0.3s;
+        transition: margin-left 0.3s ease;
     }
 
     /* DESKTOP */
     @media (min-width: 769px) {
 
-        .sidebar.active + .main {
+        .main.shift {
          margin-left: 220px;
-         width: calc(100% - 220px);
         }
 
     }
 
     /* MOBILE */
     @media (max-width: 768px) {
-
-        body {
-            flex-direction: column;
-        }
-
+        
         .main {
             margin-left: 0;
             width: 100%;
@@ -559,14 +550,15 @@
 
 <script>
 function toggleMenu() {
-    const sidebar = document.querySelector(".sidebar");
 
-    if (!sidebar) {
-        console.log("Sidebar not found");
-        return;
-    }
+    const sidebar = document.querySelector(".sidebar");
+    const main = document.querySelector(".main");
+
+    if (!sidebar || !main) return;
 
     sidebar.classList.toggle("active");
+    main.classList.toggle("shift");
+
 }
 </script>
 
