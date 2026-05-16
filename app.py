@@ -921,6 +921,15 @@ def refund():
 def upgrade():
     return render_template("upgrade.html")
 
+@app.route("/paddle/webhook", methods=["POST"])
+def paddle_webhook():
+    data = request.json
+
+    # verify event
+    # upgrade user
+
+    return "", 200
+
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
