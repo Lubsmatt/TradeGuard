@@ -42,24 +42,29 @@
 
 <script>
 
+// SANDBOX MODE
+Paddle.Environment.set("sandbox");
 
 Paddle.Initialize({
-    token: "live_9aad0d3d3042cb9b8c3585b6af7"
+    token: "test_40da1a2f7ceb60e597f5726230f"
 });
 
-console.log("Opening checkout...");
+console.log("Paddle Sandbox Loaded");
 console.log(Paddle);
 
 function openCheckout() {
+
     try {
 
         Paddle.Checkout.open({
+
             items: [
                 {
-                    priceId: "pri_01kreg5ffks3vx7awkjf0jhzf8",
+                    priceId: "pri_01kry19nv8j0aw3yvj9brb0zej",
                     quantity: 1
                 }
             ]
+
         });
 
     } catch(error) {
@@ -70,7 +75,7 @@ function openCheckout() {
 
 }
 
-</script>  
+</script>
 
 <style>
 
