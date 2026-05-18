@@ -9,6 +9,14 @@ import secrets
 from datetime import datetime, timedelta
 
 app = Flask(__name__)
+
+@app.after_request
+def add_security_headers(response):
+    response.headers['Content-Security-Policy'] = (
+        "script-src 'self' https://cdn.paddle.com 'unsafe-inline' 'unsafe-eval';"
+    )
+    return response
+
 app.secret_key = "tradeguard_secure_key_2026"
 
 @app.route("/debug_trades")
