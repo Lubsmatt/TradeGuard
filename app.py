@@ -7,45 +7,42 @@ import bcrypt
 print("Database absolute path:", os.path.abspath("database.db"))
 import secrets
 from datetime import datetime, timedelta
+from flask_talisman import Talisman
 
 app = Flask(__name__)
 
-@app.after_request
-def add_security_headers(response):
+csp = {
+    'default-src': [
+        "'self'"
+    ],
 
-    response.headers["Content-Security-Policy"] = (
-        "default-src 'self'; "
+    'script-src': [
+        "'self'",
+        "'unsafe-inline'",
+        "'unsafe-eval'",
+        "https://cdn.paddle.com",
+        "https://sandbox-cdn.paddle.com"
+    ],
 
-        # Scripts
-        "script-src 'self' "
-        "https://cdn.paddle.com "
-        "https://sandbox-cdn.paddle.com "
-        "'unsafe-inline' 'unsafe-eval'; "
+    'style-src': [
+        "'self'",
+        "'unsafe-inline'",
+        "https://sandbox-cdn.paddle.com"
+    ],
 
-        # Styles
-        "style-src 'self' "
-        "'unsafe-inline' "
-        "https://sandbox-cdn.paddle.com "
-        "https://cdn.paddle.com; "
+    'frame-src': [
+        "https://sandbox-buy.paddle.com",
+        "https://buy.paddle.com"
+    ],
 
-        # Images
-        "img-src 'self' data: https:; "
+    'img-src': [
+        "'self'",
+        "data:",
+        "https:"
+    ]
+}
 
-        # Paddle checkout iframe
-        "frame-src "
-        "https://sandbox-buy.paddle.com "
-        "https://buy.paddle.com; "
-
-        # API connections
-        "connect-src 'self' "
-        "https://api.paddle.com "
-        "https://sandbox-api.paddle.com "
-        "https://sandbox-cdn.paddle.com "
-        "https://sandbox-buy.paddle.com "
-        "https://*.paddle.com;"
-    )
-
-    return response
+Talisman(app, content_security_policy=csp)
 
 app.secret_key = "tradeguard_secure_key_2026"
 
