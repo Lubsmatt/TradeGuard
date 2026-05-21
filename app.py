@@ -15,11 +15,34 @@ def add_security_headers(response):
 
     response.headers["Content-Security-Policy"] = (
         "default-src 'self'; "
-        "script-src 'self' https://cdn.paddle.com 'unsafe-inline' 'unsafe-eval'; "
-        "style-src 'self' 'unsafe-inline'; "
+
+        # Scripts
+        "script-src 'self' "
+        "https://cdn.paddle.com "
+        "https://sandbox-cdn.paddle.com "
+        "'unsafe-inline' 'unsafe-eval'; "
+
+        # Styles
+        "style-src 'self' "
+        "'unsafe-inline' "
+        "https://sandbox-cdn.paddle.com "
+        "https://cdn.paddle.com; "
+
+        # Images
         "img-src 'self' data: https:; "
-        "frame-src https://checkout.paddle.com; "
-        "connect-src 'self' https://api.paddle.com https://sandbox-api.paddle.com https://*.paddle.com;"
+
+        # Paddle checkout iframe
+        "frame-src "
+        "https://sandbox-buy.paddle.com "
+        "https://buy.paddle.com; "
+
+        # API connections
+        "connect-src 'self' "
+        "https://api.paddle.com "
+        "https://sandbox-api.paddle.com "
+        "https://sandbox-cdn.paddle.com "
+        "https://sandbox-buy.paddle.com "
+        "https://*.paddle.com;"
     )
 
     return response
