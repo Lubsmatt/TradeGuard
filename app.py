@@ -7,15 +7,21 @@ import bcrypt
 print("Database absolute path:", os.path.abspath("database.db"))
 import secrets
 from datetime import datetime, timedelta
-from flask_talisman import Talisman
 
 app = Flask(__name__)
 
 @app.after_request
 def add_security_headers(response):
-    response.headers['Content-Security-Policy'] = (
-        "script-src 'self' https://cdn.paddle.com 'unsafe-inline' 'unsafe-eval';"
+
+    response.headers["Content-Security-Policy"] = (
+        "default-src 'self'; "
+        "script-src 'self' https://cdn.paddle.com 'unsafe-inline' 'unsafe-eval'; "
+        "style-src 'self' 'unsafe-inline'; "
+        "img-src 'self' data: https:; "
+        "frame-src https://checkout.paddle.com; "
+        "connect-src 'self' https://api.paddle.com https://sandbox-api.paddle.com https://*.paddle.com;"
     )
+
     return response
 
 app.secret_key = "tradeguard_secure_key_2026"
