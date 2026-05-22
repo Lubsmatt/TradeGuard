@@ -56,19 +56,18 @@ function openCheckout() {
 
     try {
 
-       Paddle.Checkout.open({
-
-           settings: {
-               displayMode: "inline",
-               theme: "dark"
-            },
+        Paddle.Checkout.open({
 
             items: [
                 {
                     priceId: "pri_01kry2a2v5mjxpgzmyh8afd011",
                     quantity: 1
                 }
-            ]
+            ],
+
+            customer: {
+                email: "lubegamatthew58@gmail.com"
+            }
 
         });
 
