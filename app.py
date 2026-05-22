@@ -35,6 +35,14 @@ csp = {
         "https://buy.paddle.com"
     ],
 
+    'connect-src': [
+        "'self'",
+        "https://cdn.paddle.com",
+        "https://sandbox-cdn.paddle.com",
+        "https://sandbox-buy.paddle.com",
+        "https://buy.paddle.com"
+    ],
+
     'img-src': [
         "'self'",
         "data:",
