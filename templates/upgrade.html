@@ -56,7 +56,12 @@ function openCheckout() {
 
     try {
 
-        Paddle.Checkout.open({
+       Paddle.Checkout.open({
+
+           settings: {
+               displayMode: "inline",
+               theme: "dark"
+            },
 
             items: [
                 {
