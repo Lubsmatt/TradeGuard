@@ -16,18 +16,20 @@ csp = {
         "'self'"
     ],
 
-    'script-src': [
-        "'self'",
-        "'unsafe-inline'",
-        "'unsafe-eval'",
-        "https://cdn.paddle.com",
-        "https://sandbox-cdn.paddle.com"
+   'script-src': [
+       "'self'",
+       "'unsafe-inline'",
+       "'unsafe-eval'",
+       "https://cdn.paddle.com",
+       "https://sandbox-cdn.paddle.com",
+       "https://cdn.jsdelivr.net"
     ],
 
-    'style-src': [
-        "'self'",
-        "'unsafe-inline'",
-        "https://sandbox-cdn.paddle.com"
+   'style-src': [
+       "'self'",
+       "'unsafe-inline'",
+       "https://sandbox-cdn.paddle.com",
+       "https://cdn.jsdelivr.net"
     ],
 
     'frame-src': [
@@ -40,7 +42,8 @@ csp = {
         "https://cdn.paddle.com",
         "https://sandbox-cdn.paddle.com",
         "https://sandbox-buy.paddle.com",
-        "https://buy.paddle.com"
+        "https://buy.paddle.com",
+        "https://cdn.jsdelivr.net"
     ],
 
     'img-src': [
