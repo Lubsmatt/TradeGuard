@@ -426,6 +426,7 @@ def confirm_trade():
     trade = session.get("pending_trade")
     emotion = request.form.get("emotion", "")
     confidence = request.form.get("confidence", "")
+    strategy = request.form.get("strategy", "")
     notes = request.form.get("notes", "")
 
     if not trade:
@@ -480,9 +481,10 @@ def confirm_trade():
                 result,
                 notes,
                 emotion,
-                confidence,                     
+                confidence,  
+                strategy,                   
                 date
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """, (
             user_id,
             trade.get("pair"),
@@ -494,6 +496,7 @@ def confirm_trade():
             notes,
             emotion,
             confidence,
+            strategy,
             datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         ))
 
@@ -748,6 +751,11 @@ def init_db():
 
     try:
        c.execute("ALTER TABLE trades ADD COLUMN confidence INTEGER")
+    except:
+        pass
+
+    try:
+       c.execute("ALTER TABLE trades ADD COLUMN strategy TEXT")
     except:
         pass
 
