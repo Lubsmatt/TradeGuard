@@ -810,9 +810,6 @@ init_db()  # runs when app starts on Render
 def monthly():
     if "user_id" not in session:
         return redirect(url_for("login"))
-    
-    if session.get("plan") == "free":
-        return redirect(url_for("upgrade"))
   
 
     user_id = session["user_id"]
