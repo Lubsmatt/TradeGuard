@@ -13,14 +13,34 @@
 </form>
 
 <!-- CHART -->
-<div style="margin-top:20px;">
+<div style="width:100%; max-width:900px; margin:auto; height:400px;">
     <canvas id="equityChart"></canvas>
 </div>
  
-
-
 <div class="chart-container">
     <canvas id="equityChart"></canvas>
+</div>
+
+<h2 style="margin-top:40px;">📊 Strategy Tracker</h2>
+
+<div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:20px;">
+
+{% for strategy, stats in strategy_stats.items() %}
+
+<div style="background:#111827; padding:20px; border-radius:15px; border:1px solid #1f2937;">
+
+    <h3 style="color:#00bfff;">{{ strategy }}</h3>
+
+    <p>Wins: {{ stats.wins }}</p>
+
+    <p>Losses: {{ stats.losses }}</p>
+
+    <p>Net Profit: {{ stats.profit }}</p>
+
+</div>
+
+{% endfor %}
+
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -89,5 +109,7 @@ new Chart(ctx, {
 {% endfor %}
 </table>
 </div>
+
+
 
 {% endblock %}
