@@ -55,7 +55,7 @@ csp = {
 
 Talisman(app, content_security_policy=csp)
 
-app.secret_key = "tradeguard_secure_key_2026"
+app.secret_key = os.environ.get("SECRET_KEY")
 
 @app.route("/debug_trades")
 def debug_trades():
@@ -74,7 +74,7 @@ def get_db_connection():
     conn = sqlite3.connect(DATABASE)
     conn.row_factory = sqlite3.Row
     return conn
-app.secret_key = "tradeguard_secure_key_2026"
+app.secret_key = os.environ.get("SECRET_KEY")
 
 # ===================== ALL PAIRS =====================
 
@@ -253,6 +253,11 @@ def reset_password(token):
 
     if not user:
         return "Invalid token"
+    
+    expiry = datetime.fromisoformat(user["token_expiry"])
+
+    if datetime.now() > expiry:
+        return "Reset token expired"
 
     if request.method == "POST":
         new_password = request.form["password"]
@@ -823,12 +828,15 @@ def monthly():
     if selected_month:
         cursor.execute("""
             SELECT * FROM trades
-            WHERE user_id = ? AND strftime('%Y-%m', date) = ?
+            WHERE user_id = ?
+            AND strftime('%Y-%m', date) = ?
+            ORDER BY date ASC
         """, (user_id, selected_month))
     else:
         cursor.execute("""
             SELECT * FROM trades
             WHERE user_id = ?
+            ORDER BY date ASC
         """, (user_id,))
 
     trades = cursor.fetchall()
@@ -940,6 +948,31 @@ def monthly():
 
         equity_data.append(equity)
 
+    # ================= STRATEGY TRACKER =================
+
+    strategy_stats = defaultdict(lambda: {
+        "wins": 0,
+        "losses": 0,
+        "profit": 0
+    })
+
+    for trade in trades:
+
+        strategy = trade["strategy"]
+
+        if not strategy:
+            continue
+
+        result = trade["result"].lower()
+
+        if result == "win":
+            strategy_stats[strategy]["wins"] += 1
+            strategy_stats[strategy]["profit"] += trade["reward"]
+
+        elif result == "loss":
+            strategy_stats[strategy]["losses"] += 1
+            strategy_stats[strategy]["profit"] -= trade["risk_amount"]
+
     conn.close()
 
     return render_template("monthly.html",
@@ -954,7 +987,8 @@ def monthly():
                            best_day_rate=best_day_rate,
                            best_pair=best_pair,
                            best_pair_rate=best_pair_rate,
-                           edge_score=edge_score)
+                           edge_score=edge_score,
+                           strategy_stats=strategy_stats)
 
 @app.route("/terms")
 def terms():
