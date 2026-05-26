@@ -7,8 +7,9 @@
 
 <h2 style="margin-top: 20px;">📊 Monthly Dashboard</h2>
 
-<form method="POST">
-    <input type="month" name="month" required>
+<form method="POST" style="margin-bottom:30px;"></form>
+    <input type="month" name="month" required
+    style="padding:10px; border-radius:8px; background:#1e293b; color:white; border:none;">
     <button type="submit">Filter</button>
 </form>
 
@@ -17,10 +18,6 @@
     <canvas id="equityChart"></canvas>
 </div>
  
-<div class="chart-container">
-    <canvas id="equityChart"></canvas>
-</div>
-
 <h2 style="margin-top:40px;">📊 Strategy Tracker</h2>
 
 <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:20px;">
@@ -56,7 +53,10 @@ new Chart(ctx, {
         datasets: [{
             label: 'Equity Curve',
             data: data,
-            borderWidth: 2,
+            borderColor: '#38bdf8',
+            backgroundColor: 'rgba(56,189,248,0.2)',
+            fill: true,
+            borderWidth: 3,
             tension: 0.3
         }]
     }

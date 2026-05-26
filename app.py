@@ -227,6 +227,11 @@ def forgot():
             )
             conn.commit()
 
+            expiry = datetime.fromisoformat(user["token_expiry"])
+
+            if datetime.now() > expiry:
+                return "Reset token expired"
+
             # 🔥 FORCE PRINT
             print("\n\n===== RESET LINK =====")
             print(f"http://127.0.0.1:5000/reset/{token}")
