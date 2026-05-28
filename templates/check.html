@@ -51,14 +51,31 @@
     <br><br>
 
     <label>Confidence Level (1–10):</label>
+
     <input type="number" name="confidence" min="1" max="10"
         style="width:100%; padding:10px; margin-top:5px;">
+
+    <br><br>
+    
+    <label>Strategy Used</label>
+
+    <select name="strategy" required>
+        <option value="Liquidity Sweep">Liquidity Sweep</option>
+        <option value="Breakout">Breakout</option>
+        <option value="Trend Continuation">Trend Continuation</option>
+        <option value="SMC">SMC</option>
+        <option value="Scalp">Scalp</option>
+    </select>
+    
+     
 
     <button type="submit" id="confirmBtn"
         style="width:100%; padding:10px; background:gray; color:white; border:none;"
         disabled>
         Confirm Trade
     </button>
+   
+   
 
 </form>
 
