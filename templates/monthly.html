@@ -105,7 +105,6 @@ new Chart(ctx, {
     <td class="{{ 'green' if trade.result == 'win' else 'red' }}">{{ trade.result }}</td>
     <td>{{ trade.risk_amount }}</td>
     <td>{{ trade.reward }}</td>
-    <td>{{ trade.date }}</td>
     <td>
 
     {% if trade.screenshot %}
@@ -121,6 +120,7 @@ new Chart(ctx, {
     {% endif %}
 
     </td>
+    <td>{{ trade.date }}</td>
 </tr>
 {% endfor %}
 </table>
