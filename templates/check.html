@@ -9,7 +9,10 @@
 
 <h2 style="text-align:center;">Pre-Trade Checklist</h2>
 
-<form method="POST" action="{{ url_for('confirm_trade') }}" id="checkForm">
+<form method="POST"
+      action="{{ url_for('confirm_trade') }}"
+      enctype="multipart/form-data"
+      id="checkForm">
 
     <div style="margin-bottom:10px;">
         <input type="checkbox" class="checkItem">
@@ -57,6 +60,17 @@
 
     <br><br>
     
+   
+
+    <label>Upload Trade Screenshot</label>
+
+    <input type="file"
+           name="screenshot"
+           accept="image/*"
+           style="width:100%; padding:10px; margin-top:5px;">
+    
+    <br><br>       
+
     <label>Strategy Used</label>
 
     <select name="strategy" required>
