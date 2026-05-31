@@ -1,4 +1,5 @@
 from flask import Flask, render_template, request, redirect, url_for, session
+from werkzeug.utils import secure_filename
 from datetime import datetime
 import sqlite3
 from datetime import datetime
@@ -6,10 +7,14 @@ import os
 import bcrypt
 print("Database absolute path:", os.path.abspath("database.db"))
 import secrets
+
 from datetime import datetime, timedelta
 from flask_talisman import Talisman
 
 app = Flask(__name__)
+
+UPLOAD_FOLDER = "static/uploads"
+app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 
 csp = {
     'default-src': [
@@ -230,7 +235,7 @@ def forgot():
             expiry = datetime.fromisoformat(user["token_expiry"])
 
             if datetime.now() > expiry:
-                return "Reset token expired"
+              return "Reset token expired"
 
             # 🔥 FORCE PRINT
             print("\n\n===== RESET LINK =====")
@@ -441,7 +446,25 @@ def confirm_trade():
     confidence = request.form.get("confidence", "")
     strategy = request.form.get("strategy", "")
     notes = request.form.get("notes", "")
+    screenshot = request.files.get("screenshot")
 
+    print("SCREENSHOT OBJECT:", screenshot)
+
+    filename = None
+
+    if screenshot and screenshot.filename != "":
+        filename = secure_filename(screenshot.filename)
+
+        print("FILE RECEIVED:", filename)
+
+        screenshot.save(
+            os.path.join(app.config["UPLOAD_FOLDER"], filename)
+        )
+
+        print("FILE SAVED SUCCESSFULLY")
+    else:
+        print("NO FILE RECEIVED")
+         
     if not trade:
         return "Error: No trade found. Please calculate risk again."
 
@@ -495,9 +518,10 @@ def confirm_trade():
                 notes,
                 emotion,
                 confidence,  
-                strategy,                   
+                strategy,
+                screenshot,                   
                 date
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """, (
             user_id,
             trade.get("pair"),
@@ -510,6 +534,7 @@ def confirm_trade():
             emotion,
             confidence,
             strategy,
+            filename,
             datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         ))
 
@@ -732,8 +757,10 @@ def init_db():
     try:
        c.execute("ALTER TABLE trades ADD COLUMN date TEXT")
     except:
-           pass
-     
+        pass
+    
+    
+      
     # TRADES TABLE (🔥 MOVE THIS UP BEFORE CLOSE)
     c.execute("""
     CREATE TABLE IF NOT EXISTS trades (
@@ -769,6 +796,11 @@ def init_db():
 
     try:
        c.execute("ALTER TABLE trades ADD COLUMN strategy TEXT")
+    except:
+        pass
+    
+    try:
+       c.execute("ALTER TABLE trades ADD COLUMN screenshot TEXT")
     except:
         pass
 
