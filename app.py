@@ -13,8 +13,11 @@ from flask_talisman import Talisman
 
 app = Flask(__name__)
 
-UPLOAD_FOLDER = "static/uploads"
+UPLOAD_FOLDER = os.path.join("static", "uploads")
+
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
+
+os.makedirs(app.config["UPLOAD_FOLDER"], exist_ok=True)
 
 csp = {
     'default-src': [
@@ -464,7 +467,7 @@ def confirm_trade():
         print("FILE SAVED SUCCESSFULLY")
     else:
         print("NO FILE RECEIVED")
-         
+
     if not trade:
         return "Error: No trade found. Please calculate risk again."
 
