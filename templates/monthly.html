@@ -108,18 +108,20 @@ new Chart(ctx, {
     <td>{{ trade.date }}</td>
     <td>
 
-    {% if trade.screenshot %}
+    {% if trade["screenshot"] %}
 
-    <img src="{{ url_for('static', filename='uploads/' + trade.screenshot) }}"
-         width="80"
-         style="border-radius:10px;">
+    <a href="{{ url_for('static', filename='uploads/' + trade['screenshot']) }}"
+       target="_blank">
+
+       <img src="{{ url_for('static', filename='uploads/' + trade['screenshot']) }}"
+            width="80"
+            style="border-radius:8px; cursor:pointer;">
+
+    </a>
 
     {% else %}
-
     No Image
-
     {% endif %}
-
     </td>
 </tr>
 {% endfor %}
