@@ -43,13 +43,14 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
 const data = JSON.parse('{{ equity_data | tojson | safe }}');
+const labels = JSON.parse('{{ equity_labels | tojson | safe }}');
 
 const ctx = document.getElementById('equityChart').getContext('2d');
 
 new Chart(ctx, {
     type: 'line',
     data: {
-        labels: data.map((_, i) => i + 1),
+        labels: labels,
         datasets: [{
             label: 'Equity Curve',
             data: data,
@@ -110,14 +111,10 @@ new Chart(ctx, {
 
     {% if trade["screenshot"] %}
 
-    <a href="{{ url_for('static', filename='uploads/' + trade['screenshot']) }}"
-       target="_blank">
-
-       <img src="{{ url_for('static', filename='uploads/' + trade['screenshot']) }}"
-            width="80"
-            style="border-radius:8px; cursor:pointer;">
-
-    </a>
+    <img src="{{ url_for('static', filename='uploads/' + trade['screenshot']) }}"
+         width="80"
+         style="border-radius:8px; cursor:pointer;"
+         onclick="openImage(this.src)">
 
     {% else %}
     No Image
@@ -127,6 +124,51 @@ new Chart(ctx, {
 {% endfor %}
 </table>
 </div>
+
+<div id="imageModal"
+     style="
+     display:none;
+     position:fixed;
+     top:0;
+     left:0;
+     width:100%;
+     height:100%;
+     background:rgba(0,0,0,0.9);
+     z-index:9999;
+     text-align:center;
+     ">
+
+    <span onclick="closeImage()"
+          style="
+          color:white;
+          font-size:40px;
+          position:absolute;
+          top:20px;
+          right:40px;
+          cursor:pointer;
+          ">
+          &times;
+    </span>
+
+    <img id="fullImage"
+         style="
+         max-width:90%;
+         max-height:90%;
+         margin-top:40px;
+         border-radius:10px;
+         ">
+</div>
+
+<script>
+function openImage(src) {
+    document.getElementById("imageModal").style.display = "block";
+    document.getElementById("fullImage").src = src;
+}
+
+function closeImage() {
+    document.getElementById("imageModal").style.display = "none";
+}
+</script>
 
 
 
