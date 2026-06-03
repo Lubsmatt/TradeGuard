@@ -45,8 +45,7 @@
 <script>
 console.log("Monthly page loaded");
 </script>
-const data = JSON.parse('{{ equity_data | tojson | safe }}');
-const labels = JSON.parse('{{ equity_labels | tojson | safe }}');
+
 
 const ctx = document.getElementById('equityChart').getContext('2d');
 
