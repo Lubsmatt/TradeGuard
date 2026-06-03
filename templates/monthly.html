@@ -42,8 +42,9 @@
 
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
+console.log("Monthly page loaded");
+</script>
 const data = JSON.parse('{{ equity_data | tojson | safe }}');
 const labels = JSON.parse('{{ equity_labels | tojson | safe }}');
 
