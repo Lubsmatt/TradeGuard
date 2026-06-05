@@ -207,6 +207,8 @@ def login():
 
                 session.permanent = True
 
+                print("LOGIN ERROR:", error)
+
                 return redirect(url_for("home"))
 
     return render_template("login.html", error=error)
@@ -235,10 +237,7 @@ def forgot():
             )
             conn.commit()
 
-            expiry = datetime.fromisoformat(user["token_expiry"])
-
-            if datetime.now() > expiry:
-              return "Reset token expired"
+           
 
             # 🔥 FORCE PRINT
             print("\n\n===== RESET LINK =====")
@@ -321,6 +320,7 @@ def risk():
     """, (session["user_id"], f"{today}%")).fetchone()
 
     conn.close()
+    
 
     if daily_risk_db["total"]:
         daily_risk_value = daily_risk_db["total"]
@@ -411,6 +411,11 @@ def risk():
         except Exception as e:
             print("RISK ERROR:", e)
             error = f"Error: {str(e)}"
+        
+        new_total_risk = daily_risk_value + risk_percent
+
+        if session["plan"] == "free" and new_total_risk > 5:
+            error = f"Daily risk limit exceeded. Remaining risk: {5 - daily_risk_value:.2f}%"
 
     return render_template(
         "risk.html",
@@ -977,6 +982,7 @@ def monthly():
     # 📉 EQUITY CURVE
     equity = 0
     equity_data = []
+    equity_labels = []
 
     for trade in trades:
         result = trade["result"].lower()
@@ -987,6 +993,10 @@ def monthly():
             equity -= trade["risk_amount"]
 
         equity_data.append(equity)
+
+        equity_labels.append(
+            trade["date"][:10]
+        )
 
     # ================= STRATEGY TRACKER =================
 
@@ -1015,6 +1025,10 @@ def monthly():
 
     conn.close()
 
+    print("equity_data =", equity_data)
+    print("equity_labels =", equity_labels) 
+    print("strategy_stats:", strategy_stats) 
+
     return render_template("monthly.html",
                            trades=trades,
                            total_trades=total_trades,
@@ -1022,6 +1036,7 @@ def monthly():
                            profit=profit,
                            growth=growth,
                            equity_data=equity_data,
+                           equity_labels=equity_labels,
                            expectancy=expectancy,
                            best_day=best_day,
                            best_day_rate=best_day_rate,
