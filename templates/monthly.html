@@ -42,12 +42,15 @@
 
 </div>
 
+<div style="width:100%; max-width:900px; margin:auto; height:400px;">
+    <canvas id="equityChart"></canvas>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script>
-console.log("Monthly page loaded");
-
-
+const labels = {{ equity_labels | tojson }};
+const data = {{ equity_data | tojson }};
 
 const ctx = document.getElementById('equityChart').getContext('2d');
 
@@ -64,6 +67,10 @@ new Chart(ctx, {
             borderWidth: 3,
             tension: 0.3
         }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false
     }
 });
 </script>
