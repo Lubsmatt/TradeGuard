@@ -359,6 +359,19 @@ def risk():
             tp = float(request.form["tp"])
             pair = request.form["pair"]
 
+            # ===== DAILY RISK LIMIT =====
+
+            new_total_risk = daily_risk_value + risk_percent
+            
+            if session["plan"] == "free" and daily_risk_value >= 5:
+                return render_template(
+                    "risk.html",
+                    pairs=PAIR_VALUES.keys(),
+                    result=None,
+                    error=f"Daily risk limit exceeded. Remaining risk: {max(0, 5 - daily_risk_value):.2f}%",
+                    daily_risk=daily_risk_value
+               )
+
             pip_value = PAIR_VALUES.get(pair)
 
             # ===== VALIDATIONS =====
@@ -412,11 +425,7 @@ def risk():
             print("RISK ERROR:", e)
             error = f"Error: {str(e)}"
         
-        new_total_risk = daily_risk_value + risk_percent
-
-        if session["plan"] == "free" and new_total_risk > 5:
-            error = f"Daily risk limit exceeded. Remaining risk: {5 - daily_risk_value:.2f}%"
-
+       
     return render_template(
         "risk.html",
         pairs=PAIR_VALUES.keys(),
