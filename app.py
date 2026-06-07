@@ -362,7 +362,7 @@ def risk():
             # ===== DAILY RISK LIMIT =====
 
             new_total_risk = daily_risk_value + risk_percent
-            
+
             if session["plan"] == "free" and daily_risk_value >= 5:
                 return render_template(
                     "risk.html",
@@ -796,6 +796,15 @@ def init_db():
     )
     """)
 
+    conn.execute("""
+    CREATE TABLE IF NOT EXISTS feedback (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER,
+        feedback TEXT,
+        created_at TEXT
+    )
+    """)
+
     try:
        c.execute("ALTER TABLE trades ADD COLUMN notes TEXT")
     except:
@@ -838,6 +847,8 @@ def init_db():
 
     conn.commit()
     conn.close()
+
+    
     
 @app.route("/history")
 def history():
@@ -1077,7 +1088,41 @@ def paddle_webhook():
     # verify event
     # upgrade user
 
-    return "", 200
+    return "", 200@app.route("/feedback", methods=["GET", "POST"])
+def feedback():
+
+    if "user_id" not in session:
+        return redirect(url_for("login"))
+
+    success = False
+
+    if request.method == "POST":
+
+        feedback_text = request.form["feedback"]
+
+        conn = get_db_connection()
+
+        conn.execute("""
+        INSERT INTO feedback
+        (user_id, feedback, created_at)
+        VALUES (?, ?, ?)
+        """, (
+            session["user_id"],
+            feedback_text,
+            datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        ))
+
+        conn.commit()
+        conn.close()
+
+        success = True
+
+    return render_template(
+        "feedback.html",
+        success=success
+    )
+
+
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
