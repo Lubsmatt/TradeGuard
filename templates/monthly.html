@@ -49,8 +49,11 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script>
-const labels = ["Day 1", "Day 2", "Day 3"];
-const data = [10, 50, 30];
+const labels = {{ equity_labels | tojson }};
+const data = {{ equity_data | tojson }};
+
+console.log(labels);
+console.log(data);
 
 const ctx = document.getElementById('equityChart').getContext('2d');
 
@@ -60,7 +63,12 @@ new Chart(ctx, {
         labels: labels,
         datasets: [{
             label: 'Equity Curve',
-            data: data
+            data: data,
+            borderColor: '#38bdf8',
+            backgroundColor: 'rgba(56,189,248,0.2)',
+            fill: true,
+            borderWidth: 3,
+            tension: 0.3
         }]
     }
 });
