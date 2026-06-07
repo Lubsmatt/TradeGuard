@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block title %}Feedback{% endblock %}
+
+{% block content %}
+
+<h2>💬 Feedback</h2>
+
+<p>Help us improve TradeGuard.</p>
+
+<form method="POST">
+
+    <textarea
+        name="feedback"
+        rows="8"
+        required
+        placeholder="Tell us what you like, bugs you found, or features you want..."
+        style="
+        width:100%;
+        padding:12px;
+        border-radius:10px;
+        background:#1e293b;
+        color:white;
+        border:none;
+        ">
+    </textarea>
+
+    <br><br>
+
+    <button type="submit">
+        Send Feedback
+    </button>
+
+</form>
+
+{% if success %}
+<p style="color:lime; margin-top:15px;">
+    Feedback sent successfully!
+</p>
+{% endif %}
+
+{% endblock %}
