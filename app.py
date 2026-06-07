@@ -1088,7 +1088,10 @@ def paddle_webhook():
     # verify event
     # upgrade user
 
-    return "", 200@app.route("/feedback", methods=["GET", "POST"])
+    return "", 200
+
+
+@app.route("/feedback", methods=["GET", "POST"])
 def feedback():
 
     if "user_id" not in session:
@@ -1121,7 +1124,6 @@ def feedback():
         "feedback.html",
         success=success
     )
-
 
 
 if __name__ == "__main__":
