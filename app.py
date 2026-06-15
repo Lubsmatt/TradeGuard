@@ -1125,6 +1125,24 @@ def feedback():
         success=success
     )
 
+@app.route("/admin-feedback")
+def admin_feedback():
+
+    conn = get_db_connection()
+
+    feedbacks = conn.execute("""
+        SELECT feedback.*, users.email
+        FROM feedback
+        JOIN users ON feedback.user_id = users.id
+        ORDER BY created_at DESC
+    """).fetchall()
+
+    conn.close()
+
+    return render_template(
+        "admin_feedback.html",
+        feedbacks=feedbacks
+    )
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
