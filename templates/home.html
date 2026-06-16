@@ -6,6 +6,28 @@
 
 <h2>👋 Welcome, {{ session.username }}</h2>
 
+<!-- QUICK STATS -->
+<div class="cards">
+
+    <div class="card">
+        <h3>Total Trades</h3>
+        <p>{{ total_trades }}</p>
+    </div>
+
+    <div class="card">
+        <h3>Win Rate</h3>
+        <p>{{ win_rate }}%</p>
+    </div>
+
+    <div class="card">
+        <h3>Current Plan</h3>
+        <p>{{ plan }}</p>
+    </div>
+
+</div>
+
+<br>
+
 <div class="cards">
 
     <div class="card">
@@ -24,6 +46,12 @@
         <h3>⚖️ Risk Tool</h3>
         <p>Manage your risk</p>
         <a href="/risk">Open</a>
+    </div>
+
+    <div class="card">
+        <h3>💬 Feedback</h3>
+        <p>Tell us what to improve</p>
+        <a href="/feedback">Open</a>
     </div>
 
     <div class="card">

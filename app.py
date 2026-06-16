@@ -125,7 +125,35 @@ def index():
 
 @app.route("/home")
 def home():
-    return render_template("home.html")
+
+    if "user_id" not in session:
+        return redirect(url_for("login"))
+
+    conn = get_db_connection()
+
+    total_trades = conn.execute(
+        "SELECT COUNT(*) as count FROM trades WHERE user_id=?",
+        (session["user_id"],)
+    ).fetchone()["count"]
+
+    wins = conn.execute(
+        "SELECT COUNT(*) as count FROM trades WHERE user_id=? AND result='win'",
+        (session["user_id"],)
+    ).fetchone()["count"]
+
+    conn.close()
+
+    win_rate = 0
+
+    if total_trades > 0:
+        win_rate = round((wins / total_trades) * 100, 1)
+
+    return render_template(
+        "home.html",
+        total_trades=total_trades,
+        win_rate=win_rate,
+        plan=session.get("plan", "free")
+    )
 
 # ===================== REGISTER =====================
 
