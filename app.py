@@ -829,9 +829,18 @@ def init_db():
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         user_id INTEGER,
         feedback TEXT,
+        rating INTEGER,
         created_at TEXT
     )
     """)
+
+    try:
+        conn.execute("""
+            ALTER TABLE feedback
+            ADD COLUMN rating INTEGER
+        """)
+    except:
+          pass
 
     try:
        c.execute("ALTER TABLE trades ADD COLUMN notes TEXT")
@@ -1130,18 +1139,20 @@ def feedback():
     if request.method == "POST":
 
         feedback_text = request.form["feedback"]
+        rating = request.form["rating"]
 
         conn = get_db_connection()
 
         conn.execute("""
         INSERT INTO feedback
-        (user_id, feedback, created_at)
-        VALUES (?, ?, ?)
-        """, (
-            session["user_id"],
-            feedback_text,
-            datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        ))
+        (user_id, feedback, rating, created_at)
+        VALUES (?, ?, ?, ?)
+        """,(
+             session["user_id"],
+             feedback_text,
+             rating,
+             datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            ))
 
         conn.commit()
         conn.close()
