@@ -1138,8 +1138,19 @@ def feedback():
 
     if request.method == "POST":
 
-        feedback_text = request.form["feedback"]
-        rating = request.form["rating"]
+        feedback_text = request.form.get("feedback")
+        rating = request.form.get("rating")
+
+        print("FEEDBACK:", feedback_text)
+        print("RATING:", rating)
+
+        if not feedback_text:
+            error = "Feedback cannot be empty."
+            return render_template(
+                "feedback.html",
+                 success=False,
+                 error=error
+            )
 
         conn = get_db_connection()
 
