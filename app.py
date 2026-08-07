@@ -2,11 +2,16 @@ from flask import Flask, render_template, request, redirect, url_for, session
 from werkzeug.utils import secure_filename
 from datetime import datetime
 import sqlite3
+import psycopg2
 from datetime import datetime
 import os
 import bcrypt
 print("Database absolute path:", os.path.abspath("database.db"))
 import secrets
+DATABASE_URL = os.environ.get(
+    "DATABASE_URL",
+    "dbname=tradeguard user=postgres password=Matthew host=localhost port=5432"
+)
 
 from datetime import datetime, timedelta
 from flask_talisman import Talisman
@@ -79,8 +84,7 @@ app.config["SESSION_PERMANENT"] = True
 DATABASE = "database.db"
 
 def get_db_connection():
-    conn = sqlite3.connect(DATABASE)
-    conn.row_factory = sqlite3.Row
+    conn = psycopg2.connect(DATABASE_URL)
     return conn
 app.secret_key = os.environ.get("SECRET_KEY")
 
